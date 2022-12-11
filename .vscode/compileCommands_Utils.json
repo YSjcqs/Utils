@@ -1,0 +1,27 @@
+[
+	{
+		"file": "/home/youshu/WorkSpace/Projects/Utils/Source/Utils/Utils.Build.cs",
+		"command": "/home/youshu/WorkSpace/UE_5.0/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v20_clang-13.0.1-centos7/x86_64-unknown-linux-gnu/bin/clang++ @/home/youshu/WorkSpace/Projects/Utils/.vscode/compileCommands_Utils/Utils.201.rsp",
+		"directory": "/home/youshu/WorkSpace/UE_5.0/Engine/Source"
+	},
+	{
+		"file": "/home/youshu/WorkSpace/Projects/Utils/Source/Utils/Utils.cpp",
+		"command": "/home/youshu/WorkSpace/UE_5.0/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v20_clang-13.0.1-centos7/x86_64-unknown-linux-gnu/bin/clang++ @/home/youshu/WorkSpace/Projects/Utils/.vscode/compileCommands_Utils/Utils.201.rsp",
+		"directory": "/home/youshu/WorkSpace/UE_5.0/Engine/Source"
+	},
+	{
+		"file": "/home/youshu/WorkSpace/Projects/Utils/Source/Utils/Utils.h",
+		"command": "/home/youshu/WorkSpace/UE_5.0/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v20_clang-13.0.1-centos7/x86_64-unknown-linux-gnu/bin/clang++ @/home/youshu/WorkSpace/Projects/Utils/.vscode/compileCommands_Utils/Utils.201.rsp",
+		"directory": "/home/youshu/WorkSpace/UE_5.0/Engine/Source"
+	},
+	{
+		"file": "/home/youshu/WorkSpace/Projects/Utils/Source/Utils/UtilsGameModeBase.cpp",
+		"command": "/home/youshu/WorkSpace/UE_5.0/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v20_clang-13.0.1-centos7/x86_64-unknown-linux-gnu/bin/clang++ @/home/youshu/WorkSpace/Projects/Utils/.vscode/compileCommands_Utils/Utils.201.rsp",
+		"directory": "/home/youshu/WorkSpace/UE_5.0/Engine/Source"
+	},
+	{
+		"file": "/home/youshu/WorkSpace/Projects/Utils/Source/Utils/UtilsGameModeBase.h",
+		"command": "/home/youshu/WorkSpace/UE_5.0/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v20_clang-13.0.1-centos7/x86_64-unknown-linux-gnu/bin/clang++ @/home/youshu/WorkSpace/Projects/Utils/.vscode/compileCommands_Utils/Utils.201.rsp",
+		"directory": "/home/youshu/WorkSpace/UE_5.0/Engine/Source"
+	}
+]

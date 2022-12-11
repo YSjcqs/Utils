@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root xmlns:android="http://schemas.android.com/apk/res/android">
+    <init>
+        <log text=" NativeAndroidPlatform_UPL INIT"/>
+    </init>
+    
+    <resourceCopies>
+        <copyDir src = "$S(PluginDir)/../Android/Java" dst = "$S(BuildDir)/src/com/epicgames/unreal" />
+        <copyFile src = "$S(PluginDir)/../ThirdParty/Android/Nui/nuisdk-release.aar" dst = "$S(BuildDir)/libs/nuisdk-release.aar" />
+        <copyFile src = "$S(PluginDir)/../ThirdParty/Android/Nui/fastjson-1.1.46.android.jar" dst = "$S(BuildDir)/libs/fastjson-1.1.46.android.jar" />
+    </resourceCopies>
+
+    <gameActivityImportAdditions>
+        <insert>
+<![CDATA[
+]]>
+        </insert>
+    </gameActivityImportAdditions>
+
+    <gameActivityClassAdditions>
+        <insert>
+<![CDATA[
+    NuiSpeechManager nui_speech_manager = new NuiSpeechManager();
+    public int initNuiSpeech(int vad_mode, int log_level, boolean save_log)
+    {
+        return nui_speech_manager.initNuiSpeech(this,vad_mode, log_level, save_log);
+    }
+
+    public int nuiStart(String app_key, String app_token, String nui_url)
+    {
+        return nui_speech_manager.nuiStart(app_key, app_token, nui_url);
+    }
+
+    public int nuiStop()
+    {
+        return nui_speech_manager.nuiStop();
+    }
+
+    public int startDialog() {
+        return nui_speech_manager.startDialog();
+    }
+
+    public int stopDialog() {
+        return nui_speech_manager.stopDialog();
+    }
+
+    public boolean checkNuiInitState()
+    {
+        return nui_speech_manager.checkNuiInitState();
+    }
+]]>
+        </insert>
+    </gameActivityClassAdditions>
+
+    <gameActivityOnCreateAdditions>
+        <insert>
+        </insert>
+    </gameActivityOnCreateAdditions>
+
+    <baseBuildGradleAdditions>
+        <insert>
+<![CDATA[
+]]>
+        </insert>
+    </baseBuildGradleAdditions>
+
+    <buildGradleAdditions>
+        <insert>
+<![CDATA[
+repositories {
+    flatDir{ dirs '/src/main/libs/' }
+}
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.aar'])
+	implementation fileTree(dir: 'src/main/libs', include: ['*.aar'])
+}
+]]>
+        </insert>
+    </buildGradleAdditions>
+
+</root>
