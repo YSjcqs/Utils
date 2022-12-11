@@ -2,6 +2,8 @@
 .vs/
 .vscode
 *.ignore
+*.code-workspace
+*Makefile
 
 # Rider
 .idea/
@@ -80,3 +82,4 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+Makefile
