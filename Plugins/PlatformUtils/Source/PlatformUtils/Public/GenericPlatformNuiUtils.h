@@ -76,6 +76,21 @@ enum class ENuiEvent : uint8
 };
 
 UENUM(BlueprintType)
+enum class ENuiVprEvent : uint8
+{
+	EVENT_VPR_NONE = 0,
+	EVENT_VPR_REGISTER_START,
+	EVENT_VPR_REGISTER_DONE,
+	EVENT_VPR_REGISTER_FAILED,
+	EVENT_VPR_UPDATE_START,
+	EVENT_VPR_UPDATE_DONE,
+	EVENT_VPR_UPDATE_FAIL,
+	EVENT_VPR_DELETE_DONE,
+	EVENT_VPR_DELETE_FAIL,
+	DEFAULT_ERROR
+};
+
+UENUM(BlueprintType)
 enum class EWuwType : uint8
 {
 	TYPE_UNKNOWN = static_cast<uint8>(-1),
@@ -86,52 +101,34 @@ enum class EWuwType : uint8
 	TYPE_ONESHOT = 4
 };
 
-USTRUCT(BlueprintType)
-struct PLATFORMUTILS_API FKwsResult
+UENUM(BlueprintType)
+enum class ETtsEvent : uint8
 {
-	GENERATED_BODY()
-
-public:
-	EWuwType Type;
-	FString Kws;
-
-	FKwsResult(): Type(EWuwType::TYPE_UNKNOWN)
-	{
-	}
-
-	FKwsResult(int type, FString kws)
-	{
-		Type = static_cast<EWuwType>(type);
-		Kws = kws;
-	}
+	TTS_EVENT_START = 0,
+	TTS_EVENT_END = 1,
+	TTS_EVENT_CANCEL = 2,
+	TTS_EVENT_PAUSE = 3,
+	TTS_EVENT_RESUME = 4,
+	TTS_EVENT_ERROR = 5
 };
 
-USTRUCT(BlueprintType)
-struct PLATFORMUTILS_API FAsrResult
-{
-	GENERATED_BODY()
+// package com.epicgames.unreal.speechrec;->NuiSpeechManager
+// public static native void DialogEventCallback(int NuiEvent, int resultCode, String asrString);
+// public static native void DialogAudioStateChanged(int var1);
+// public static native void DialogAudioRMSChanged(float var1);
+// public static native void DialogVprEventCallback(int var1);
+//
+// public static native void TtsEventCallback(int var1, String var2, int var3);
+// public static native void TtsVolCallback(int var1);
 
-public:
-	bool bFinish;
-	int ResultCode;
-	FString AsrResult;
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FDialogEventCallbackDelegate, ENuiEvent, int, FString);
+DECLARE_MULTICAST_DELEGATE_OneParam(FDialogAudioStateChangedDelegate, EAudioState);
+DECLARE_MULTICAST_DELEGATE_OneParam(FDialogAudioRMSChangedDelegate, float);
+DECLARE_MULTICAST_DELEGATE_OneParam(FDialogVprEventCallbackDelegate, ENuiVprEvent);
 
-	FAsrResult(): bFinish(false), ResultCode(-1)
-	{
-	}
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FTtsEventCallbackDelegate, ETtsEvent, FString, int);
+DECLARE_MULTICAST_DELEGATE_OneParam(FTtsVolCallbackDelegate, int);
 
-	FAsrResult(bool finish, int resultCode, FString result)
-	{
-		bFinish = finish;
-		ResultCode = resultCode;
-		AsrResult = result;
-	}
-};
-
-DECLARE_MULTICAST_DELEGATE_FiveParams(FNuiEventDelegate, ENuiEvent, int, int, FKwsResult, FAsrResult);
-DECLARE_MULTICAST_DELEGATE_OneParam(FNuiAudioStateChangedDelegate, EAudioState);
-DECLARE_MULTICAST_DELEGATE_OneParam(FNuiAudioRMSChangedDelegate, float);
-DECLARE_MULTICAST_DELEGATE_OneParam(FNuiVprEventCallbackDelegate, ENuiEvent);
 
 struct PLATFORMUTILS_API INativeNuiCallback
 {
@@ -140,36 +137,43 @@ public:
 	{
 	}
 
-	virtual void onNuiEventCallback(ENuiEvent event, int resultCode, int arg2, FKwsResult kwsResult,
-	                                FAsrResult asrResult)
+	void OnDialogEventCallback(ENuiEvent NuiEvent, int ResultCode, FString AsrString)
 	{
-		NuiEventDelegate.Broadcast(event, resultCode, arg2, kwsResult, asrResult);
+		DialogEventCallbackDelegate.Broadcast(NuiEvent, ResultCode, AsrString);
 	}
 
-	// UE不处理该接口，全权由平台自己处理
-	virtual void onNuiNeedAudioData(char* buffer, int var2)
+	void OnDialogAudioStateChanged(EAudioState AudioState)
 	{
-	};
-
-	virtual void onNuiAudioStateChanged(EAudioState var1)
-	{
-		NuiAudioStateChangedDelegate.Broadcast(var1);
+		DialogAudioStateChangedDelegate.Broadcast(AudioState);
 	}
 
-	virtual void onNuiAudioRMSChanged(float var1)
+	void OnDialogAudioRMSChanged(float Value)
 	{
-		NuiAudioRMSChangedDelegate.Broadcast(var1);
+		DialogAudioRmsChangedDelegate.Broadcast(Value);
 	}
 
-	virtual void onNuiVprEventCallback(ENuiEvent var1)
+	void OnDialogVprEventCallback(ENuiVprEvent NuiVprEvent)
 	{
-		NuiVprEventCallbackDelegate.Broadcast(var1);
+		DialogVprEventCallbackDelegate.Broadcast(NuiVprEvent);
 	}
 
-	FNuiEventDelegate NuiEventDelegate;
-	FNuiAudioStateChangedDelegate NuiAudioStateChangedDelegate;
-	FNuiAudioRMSChangedDelegate NuiAudioRMSChangedDelegate;
-	FNuiVprEventCallbackDelegate NuiVprEventCallbackDelegate;
+	void OnTtsEventCallback(ETtsEvent TtsEvent, FString TaskID, int ResultCode)
+	{
+		TtsEventCallbackDelegate.Broadcast(TtsEvent, TaskID, ResultCode);
+	}
+
+	void OnTtsVolCallback(int Vol)
+	{
+		TtsVolCallbackDelegate.Broadcast(Vol);
+	}
+
+	FDialogEventCallbackDelegate DialogEventCallbackDelegate;
+	FDialogAudioStateChangedDelegate DialogAudioStateChangedDelegate;
+	FDialogAudioRMSChangedDelegate DialogAudioRmsChangedDelegate;
+	FDialogVprEventCallbackDelegate DialogVprEventCallbackDelegate;
+
+	FTtsEventCallbackDelegate TtsEventCallbackDelegate;
+	FTtsVolCallbackDelegate TtsVolCallbackDelegate;
 };
 
 struct PLATFORMUTILS_API FGenericPlatformNuiUtils : public INativeNuiCallback
@@ -180,48 +184,26 @@ public:
 public:
 	FGenericPlatformNuiUtils();
 
-	virtual ~FGenericPlatformNuiUtils()
-	{
-	}
+	virtual ~FGenericPlatformNuiUtils(){}
 
-	virtual int InitNuiSpeech()
-	{
-		return -1;
-	}
+	virtual void InitNuiSpeech(){}
+	virtual void ReleaseNuiSpeech()	{}
 
-	virtual bool CheckNuiInitState()
-	{
-		return false;
-	}
+	virtual bool StartDialog() {return false;}
+	virtual bool StopDialog() {return false;}
+	virtual bool CheckDialog() {return false;}
+	virtual void DialogAudioPermissions() {}
 
-	virtual int OnNuiStart()
-	{
-		return -1;
-	}
+	virtual bool StartTts(FString TtsText) {return false;}
+	virtual bool QuitTts() {return false;}
+	virtual bool CancelTts() {return false;}
+	virtual bool PauseTts() {return false;}
+	virtual bool ResumeTts() {return false;}
+	virtual bool CheckTts() {return false;}
 
-	virtual int OnNuiStop()
-	{
-		return -1;
-	}
-
-	virtual int StartDialog()
-	{
-		return -1;
-	}
-
-	virtual int StopDialog()
-	{
-		return -1;
-	}
 
 protected:
-	bool bSaveLog = true;
-	ENuiLogLevel NuiLogLevel = ENuiLogLevel::LOG_LEVEL_VERBOSE;
-	ENuiVadMode NuiVadMode = ENuiVadMode::MODE_P2T;
-	FString NuiUrl = TEXT("wss://nls-gateway.cn-shanghai.aliyuncs.com:443/ws/v1");
 	FString AppKey = TEXT("J8PkaDSNkxymRdPh");
-	FString AppToken = TEXT("a54492ca01a349938ff5636f9942889e");
-
-	// const char* const AccessKeyId = "LTAI5tQqNzJRwYnMMinoAuUN";
-	// const char* const AccessKeySecret = "R9wuHhUQmocckKPIAS3HxXuLqIeWUw";
+	FString AccessKeyId = TEXT("LTAI5tQqNzJRwYnMMinoAuUN");
+	FString AccessKeySecret = TEXT("R9wuHhUQmocckKPIAS3HxXuLqIeWUw");
 };

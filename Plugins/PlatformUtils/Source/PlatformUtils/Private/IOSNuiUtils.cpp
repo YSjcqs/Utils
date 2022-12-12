@@ -3,32 +3,62 @@
 
 #include "IOSNuiUtils.h"
 
-int FIOSNuiUtils::InitNuiSpeech()
+void FIOSNuiUtils::InitNuiSpeech()
 {
-	return FGenericPlatformNuiUtils::InitNuiSpeech();
+	FGenericPlatformNuiUtils::InitNuiSpeech();
 }
 
-bool FIOSNuiUtils::CheckNuiInitState()
+void FIOSNuiUtils::ReleaseNuiSpeech()
 {
-	return FGenericPlatformNuiUtils::CheckNuiInitState();
+	FGenericPlatformNuiUtils::ReleaseNuiSpeech();
 }
 
-int FIOSNuiUtils::OnNuiStart()
-{
-	return FGenericPlatformNuiUtils::OnNuiStart();
-}
-
-int FIOSNuiUtils::OnNuiStop()
-{
-	return FGenericPlatformNuiUtils::OnNuiStop();
-}
-
-int FIOSNuiUtils::StartDialog()
+bool FIOSNuiUtils::StartDialog()
 {
 	return FGenericPlatformNuiUtils::StartDialog();
 }
 
-int FIOSNuiUtils::StopDialog()
+bool FIOSNuiUtils::StopDialog()
 {
 	return FGenericPlatformNuiUtils::StopDialog();
+}
+
+bool FIOSNuiUtils::CheckDialog()
+{
+	return FGenericPlatformNuiUtils::CheckDialog();
+}
+
+void FIOSNuiUtils::DialogAudioPermissions()
+{
+	FGenericPlatformNuiUtils::DialogAudioPermissions();
+}
+
+bool FIOSNuiUtils::StartTts(FString TtsText)
+{
+	return FGenericPlatformNuiUtils::StartTts(TtsText);
+}
+
+bool FIOSNuiUtils::QuitTts()
+{
+	return FGenericPlatformNuiUtils::QuitTts();
+}
+
+bool FIOSNuiUtils::CancelTts()
+{
+	return FGenericPlatformNuiUtils::CancelTts();
+}
+
+bool FIOSNuiUtils::PauseTts()
+{
+	return FGenericPlatformNuiUtils::PauseTts();
+}
+
+bool FIOSNuiUtils::ResumeTts()
+{
+	return FGenericPlatformNuiUtils::ResumeTts();
+}
+
+bool FIOSNuiUtils::CheckTts()
+{
+	return FGenericPlatformNuiUtils::CheckTts();
 }

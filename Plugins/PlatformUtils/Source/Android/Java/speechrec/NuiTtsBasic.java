@@ -17,29 +17,19 @@
 
 package com.epicgames.unreal.speechrec;
 
-import android.app.Activity;
-import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
 
-import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.idst.nui.CommonUtils;
 import com.alibaba.idst.nui.Constants;
 import com.alibaba.idst.nui.INativeTtsCallback;
 import com.alibaba.idst.nui.NativeNui;
-import com.epicgames.unreal.GameActivity;
+import com.epicgames.unreal.Logger;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
 public class NuiTtsBasic implements INativeTtsCallback {
-    private static final String TAG = "NuiTtsBasic";
+    public static Logger Log = new Logger("UE", "NuiTtsBasic");
 
     NativeNui nui_tts_instance = new NativeNui(Constants.ModeType.MODE_TTS);
     private OutputStream output_file = null;
@@ -47,19 +37,14 @@ public class NuiTtsBasic implements INativeTtsCallback {
     //  AudioPlayer默认采样率是16000
     private AudioPlayer mAudioTrack =  new AudioPlayer(new AudioPlayerCallback() {
         @Override
-        public void playStart() {
-            GameActivity.Debug(TAG, "start play");
-        }
+        public void playStart() { Log.debug("start play"); }
         @Override
-        public void playOver() {
-
-            GameActivity.Debug(TAG, "play over");
-        }
+        public void playOver() { Log.debug("play over"); }
     });
     boolean initialized =  false;
 
     public int releaseTts() {
-        GameActivity.Debug(TAG, "tts release");
+        Log.warn("tts release");
         mAudioTrack.stop();
         initialized = false;
         return nui_tts_instance.tts_release();
@@ -71,42 +56,42 @@ public class NuiTtsBasic implements INativeTtsCallback {
             return;
         }
         if (TextUtils.isEmpty(ttsText)) {
-            GameActivity.Debug(TAG, "tts empty");
+            Log.error("tts empty");
             return;
         }
 
-        GameActivity.Debug(TAG, "start play tts");
+        Log.debug("start play tts");
         // 支持一次性合成300字符以内的文字，其中1个汉字、1个英文字母或1个标点均算作1个字符，
         // 超过300个字符的内容将会截断。所以请确保传入的text小于300字符(不包含ssml格式)。
         int charNum = nui_tts_instance.getUtf8CharsNum(ttsText);
-        GameActivity.Debug(TAG, "chars:" + charNum + " of text:" + ttsText);
+        Log.debug("chars:" + charNum + " of text:" + ttsText);
         if (charNum > 300) {
-            GameActivity.Debug(TAG, "text exceed 300 chars.");
+            Log.warn("text exceed 300 chars.");
         }
         nui_tts_instance.startTts("1", "", ttsText);
     }
     public void quitTts()
     {
-        GameActivity.Debug(TAG, "tts release");
+        Log.debug("tts release");
         mAudioTrack.stop();
         nui_tts_instance.tts_release();
         initialized = false;
     }
     public void cancelTts()
     {
-        GameActivity.Debug(TAG, "cancel tts");
+        Log.debug("cancel tts");
         nui_tts_instance.cancelTts("");
         mAudioTrack.stop();
     }
     public void pauseTts()
     {
-        GameActivity.Debug(TAG, "pause tts");
+        Log.debug("pause tts");
         nui_tts_instance.pauseTts();
         mAudioTrack.pause();
     }
     public void resumeTts()
     {
-        GameActivity.Debug(TAG, "resume tts");
+        Log.debug("resume tts");
         nui_tts_instance.resumeTts();
         mAudioTrack.play();
     }
@@ -115,7 +100,7 @@ public class NuiTtsBasic implements INativeTtsCallback {
         int ret = nui_tts_instance.tts_initialize(this, ticket, Constants.LogLevel.LOG_LEVEL_VERBOSE, true);
 
         if (Constants.NuiResultCode.SUCCESS != ret) {
-            GameActivity.Debug(TAG, "create failed");
+            Log.error("create failed");
         }
 
         // 在线语音合成发音人可以参考阿里云官网
@@ -142,17 +127,26 @@ public class NuiTtsBasic implements INativeTtsCallback {
         return ret;
     }
 
+    public boolean checkNotInitToast() {
+        if (!initialized) {
+            Log.warn("nui dialog not init!");
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     @Override
     public void onTtsEventCallback(TtsEvent event, String task_id, int ret_code) {
-        GameActivity.Debug(TAG, "tts event:" + event + " task id " + task_id + " ret " + ret_code);
+        Log.warn("tts event:" + event + " task id " + task_id + " ret " + ret_code);
         if (event == TtsEvent.TTS_EVENT_START) {
             mAudioTrack.play();
-            GameActivity.Debug(TAG, "start play");
+            Log.debug("start play");
         } else if (event == TtsEvent.TTS_EVENT_END) {
             /*
              * 提示: TTS_EVENT_END事件表示TTS已经合成完并通过回调传回了所有音频数据, 而不是表示播放器已经播放完了所有音频数据。
              */
-            GameActivity.Debug(TAG, "play end");
+            Log.warn("play end");
 
             // 表示推送完数据, 当播放器播放结束则会有playOver回调
             mAudioTrack.isFinishSend(true);
@@ -167,7 +161,7 @@ public class NuiTtsBasic implements INativeTtsCallback {
             }
         } else if (event == TtsEvent.TTS_EVENT_PAUSE) {
             mAudioTrack.pause();
-            GameActivity.Debug(TAG, "play pause");
+            Log.warn("play pause");
         } else if (event == TtsEvent.TTS_EVENT_RESUME) {
             mAudioTrack.play();
         } else if (event == TtsEvent.TTS_EVENT_ERROR) {
@@ -175,17 +169,24 @@ public class NuiTtsBasic implements INativeTtsCallback {
             mAudioTrack.isFinishSend(true);
 
             String error_msg =  nui_tts_instance.getparamTts("error_msg");
-            GameActivity.Debug(TAG, "TTS_EVENT_ERROR error_code:" + ret_code + " errmsg:" + error_msg);
+            Log.error("TTS_EVENT_ERROR error_code:" + ret_code + " errmsg:" + error_msg);
+        }
+
+        try {
+            NuiSpeechManager.TtsEventCallback(event.ordinal(), task_id, ret_code);
+        }catch (Exception ex) {
+            ex.printStackTrace();
+            Log.error(ex.getMessage());
         }
     }
     @Override
     public void onTtsDataCallback(String info, int info_len, byte[] data) {
         if (info.length() > 0) {
-            GameActivity.Debug(TAG, "info: " + info);
+            Log.debug("info: " + info);
         }
         if (data.length > 0) {
             mAudioTrack.setAudioData(data);
-            GameActivity.Debug(TAG, "write:" + data.length);
+            Log.debug("write:" + data.length);
             if (b_savewav) {
                 try {
                     output_file.write(data);
@@ -197,6 +198,12 @@ public class NuiTtsBasic implements INativeTtsCallback {
     }
     @Override
     public void onTtsVolCallback(int vol) {
-        GameActivity.Debug(TAG, "tts vol " + vol);
+        Log.debug("tts vol " + vol);
+        try {
+            NuiSpeechManager.TtsVolCallback(vol);
+        }catch (Exception ex) {
+            ex.printStackTrace();
+            Log.error(ex.getMessage());
+        }
     }
 }

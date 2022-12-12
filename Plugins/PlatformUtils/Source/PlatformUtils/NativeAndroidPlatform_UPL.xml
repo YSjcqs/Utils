@@ -6,13 +6,22 @@
     
     <resourceCopies>
         <copyDir src = "$S(PluginDir)/../Android/Java" dst = "$S(BuildDir)/src/com/epicgames/unreal" />
-        <copyFile src = "$S(PluginDir)/../ThirdParty/Android/Nui/nuisdk-release.aar" dst = "$S(BuildDir)/libs/nuisdk-release.aar" />
-        <copyFile src = "$S(PluginDir)/../ThirdParty/Android/Nui/fastjson-1.1.46.android.jar" dst = "$S(BuildDir)/libs/fastjson-1.1.46.android.jar" />
+        <copyDir src = "$S(PluginDir)/../ThirdParty/Android/Nui" dst = "$S(BuildDir)/libs" />
     </resourceCopies>
+    
+    <androidManifestUpdates>
+        <addPermission android:name="android.permission.RECORD_AUDIO"/>
+        <addPermission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+        <addPermission android:name="android.permission.READ_PHONE_STATE"/>
+        <addPermission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+        <addPermission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+        <addPermission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE"/>
+    </androidManifestUpdates>
 
     <gameActivityImportAdditions>
         <insert>
 <![CDATA[
+import com.epicgames.unreal.speechrec.NuiSpeechManager;
 ]]>
         </insert>
     </gameActivityImportAdditions>
@@ -20,34 +29,92 @@
     <gameActivityClassAdditions>
         <insert>
 <![CDATA[
-    NuiSpeechManager nui_speech_manager = new NuiSpeechManager();
-    public int initNuiSpeech(int vad_mode, int log_level, boolean save_log)
-    {
-        return nui_speech_manager.initNuiSpeech(this,vad_mode, log_level, save_log);
-    }
+    private NuiSpeechManager SpeechManager = new NuiSpeechManager();
 
-    public int nuiStart(String app_key, String app_token, String nui_url)
-    {
-        return nui_speech_manager.nuiStart(app_key, app_token, nui_url);
-    }
+	public void initNuiSdk(String app_key, String accessKeyId, String accessKeySecret) {
+		SpeechManager.initialize(this, app_key, app_key, accessKeySecret);
+	}
 
-    public int nuiStop()
-    {
-        return nui_speech_manager.nuiStop();
-    }
+	public void releaseNuiSdk()
+	{
+		SpeechManager.speechTranscriber.releaseDialog();
+		SpeechManager.ttsBasic.releaseTts();
+	}
 
-    public int startDialog() {
-        return nui_speech_manager.startDialog();
-    }
+	public void dialogAudioPermissions() {
+		SpeechManager.audioPermissions(this);
+	}
 
-    public int stopDialog() {
-        return nui_speech_manager.stopDialog();
-    }
+	public boolean startDialog() {
+		if (SpeechManager.speechTranscriber.checkNotInitToast()) {
+			SpeechManager.speechTranscriber.startDialog();
+			return true;
+		}
+		return false;
+	}
 
-    public boolean checkNuiInitState()
-    {
-        return nui_speech_manager.checkNuiInitState();
-    }
+	public boolean stopDialog() {
+		if (SpeechManager.speechTranscriber.checkNotInitToast()) {
+			SpeechManager.speechTranscriber.stopDialog();
+			return true;
+		}
+		return false;
+	}
+
+	public boolean checkDialog()
+	{
+		return SpeechManager.speechTranscriber.checkNotInitToast();
+	}
+
+	public boolean startTts(String ttsText)
+	{
+		if (SpeechManager.ttsBasic.checkNotInitToast()){
+			SpeechManager.ttsBasic.startTts(ttsText);
+			return true;
+		}
+		return false;
+	}
+
+	public boolean quitTts()
+	{
+		if (SpeechManager.ttsBasic.checkNotInitToast()){
+			SpeechManager.ttsBasic.quitTts();
+			return true;
+		}
+		return false;
+	}
+
+	public boolean cancelTts()
+	{
+		if (SpeechManager.ttsBasic.checkNotInitToast()){
+			SpeechManager.ttsBasic.cancelTts();
+			return true;
+		}
+		return false;
+	}
+
+	public boolean pauseTts()
+	{
+		if (SpeechManager.ttsBasic.checkNotInitToast()){
+			SpeechManager.ttsBasic.pauseTts();
+			return true;
+		}
+		return false;
+	}
+
+	public boolean resumeTts()
+	{
+		if (SpeechManager.ttsBasic.checkNotInitToast()){
+			SpeechManager.ttsBasic.resumeTts();
+			return true;
+		}
+		return false;
+	}
+
+	public boolean checkTts()
+	{
+		return SpeechManager.ttsBasic.checkNotInitToast();
+	}
 ]]>
         </insert>
     </gameActivityClassAdditions>

@@ -15,26 +15,26 @@ class UTILS_API UGlobalDataInstance : public UGameInstance
 public:
 	virtual void Init() override;
 
-	UFUNCTION(BlueprintCallable, Category = "NUI")
-	int InitNuiSpeech();
-
-	UFUNCTION(BlueprintCallable, Category = "NUI")
-	bool CheckNuiInitState();
-
-	UFUNCTION(BlueprintCallable, Category = "NUI")
-	virtual int OnNuiStart();
-
-	UFUNCTION(BlueprintCallable, Category = "NUI")
-	virtual int OnNuiStop();
-
-	UFUNCTION(BlueprintCallable, Category = "NUI")
-	virtual int StartDialog();
-
-	UFUNCTION(BlueprintCallable, Category = "NUI")
-	virtual int StopDialog();
-
-	UFUNCTION()
-	void OnNuiEventCallback(ENuiEvent event, int resultCode, int arg2, FKwsResult kwsResult, FAsrResult asrResult);
+	// UFUNCTION(BlueprintCallable, Category = "NUI")
+	// int InitNuiSpeech();
+	//
+	// UFUNCTION(BlueprintCallable, Category = "NUI")
+	// bool CheckNuiInitState();
+	//
+	// UFUNCTION(BlueprintCallable, Category = "NUI")
+	// virtual int OnNuiStart();
+	//
+	// UFUNCTION(BlueprintCallable, Category = "NUI")
+	// virtual int OnNuiStop();
+	//
+	// UFUNCTION(BlueprintCallable, Category = "NUI")
+	// virtual int StartDialog();
+	//
+	// UFUNCTION(BlueprintCallable, Category = "NUI")
+	// virtual int StopDialog();
+	//
+	// UFUNCTION()
+	// void OnNuiEventCallback(ENuiEvent event, int resultCode, int arg2, FKwsResult kwsResult, FAsrResult asrResult);
 
 protected:
 	TSharedPtr<FNuiUtils> NuiUtils;

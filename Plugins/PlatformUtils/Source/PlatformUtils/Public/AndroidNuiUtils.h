@@ -9,12 +9,19 @@
 struct PLATFORMUTILS_API FAndroidNuiUtils : public FGenericPlatformNuiUtils
 {
 	FAndroidNuiUtils();
-	virtual int InitNuiSpeech() override;
-	virtual bool CheckNuiInitState() override;
-	virtual int OnNuiStart() override;
-	virtual int OnNuiStop() override;
-	virtual int StartDialog() override;
-	virtual int StopDialog() override;
+	virtual ~FAndroidNuiUtils();
+	virtual void InitNuiSpeech() override;
+	virtual void ReleaseNuiSpeech() override;
+	virtual bool StartDialog() override;
+	virtual bool StopDialog() override;
+	virtual bool CheckDialog() override;
+	virtual void DialogAudioPermissions() override;
+	virtual bool StartTts(FString TtsText) override;
+	virtual bool QuitTts() override;
+	virtual bool CancelTts() override;
+	virtual bool PauseTts() override;
+	virtual bool ResumeTts() override;
+	virtual bool CheckTts() override;
 };
 
 #endif
