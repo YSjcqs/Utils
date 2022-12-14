@@ -1,1 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
+<root>
+    <init>
+        <log text="Native IOS utils adding camera roll permission to plist..."/>
+    </init>
+    <iosPListUpdates>
+        <addElements tag="dict" once="true">
+            <key> NSLocationAlwaysAndWhenInUseUsageDescription </key>
+            <string>灵灵依需要您的同意,才能访问位置</string>
+            <key>UIViewControllerBasedStatusBarAppearance</key>
+            <true/>
+            <key>NSMicrophoneUsageDescription</key>
+            <string>灵灵依请求获取录音权限用于语音输入</string>
+            <key>NSAppTransportSecurity</key>
+            <dict>
+                <key>NSAllowsArbitraryLoads</key>
+                <true/>
+            </dict>
+        </addElements>
+    </iosPListUpdates>
+</root>

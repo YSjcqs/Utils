@@ -95,6 +95,12 @@ public class NuiTtsBasic implements INativeTtsCallback {
         nui_tts_instance.resumeTts();
         mAudioTrack.play();
     }
+    
+    public void setFontName(String name)
+    {
+        Log.debug("new font name:" + name);
+        nui_tts_instance.setparamTts("font_name", name);
+    }
 
     public int initialize(String ticket) {
         int ret = nui_tts_instance.tts_initialize(this, ticket, Constants.LogLevel.LOG_LEVEL_VERBOSE, true);

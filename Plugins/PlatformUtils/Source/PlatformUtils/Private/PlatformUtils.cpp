@@ -2,6 +2,8 @@
 
 #include "PlatformUtils.h"
 
+#include "NuiUtils.h"
+
 #define LOCTEXT_NAMESPACE "FPlatformUtilsModule"
 
 void FPlatformUtilsModule::StartupModule()
@@ -13,15 +15,6 @@ void FPlatformUtilsModule::ShutdownModule()
 {
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
-}
-
-TSharedPtr<FNuiUtils> FPlatformUtilsModule::GetNuiUtils()
-{
-	if (!NuiUtilsInstance.IsValid())
-	{
-		NuiUtilsInstance = MakeShareable(new FNuiUtils);
-	}
-	return NuiUtilsInstance;
 }
 
 #undef LOCTEXT_NAMESPACE

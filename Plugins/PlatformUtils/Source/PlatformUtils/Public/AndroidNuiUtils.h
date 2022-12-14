@@ -1,27 +1,46 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-#if PLATFORM_ANDROID
 
 #include "CoreMinimal.h"
-#include "GenericPlatformNuiUtils.h"
+#include "NuiUtils.h"
+#include "AndroidNuiUtils.generated.h"
 
-struct PLATFORMUTILS_API FAndroidNuiUtils : public FGenericPlatformNuiUtils
+UCLASS()
+class PLATFORMUTILS_API UAndroidNuiDialogUtils : public UNuiDialogUtilsBase
 {
-	FAndroidNuiUtils();
-	virtual ~FAndroidNuiUtils();
-	virtual void InitNuiSpeech() override;
-	virtual void ReleaseNuiSpeech() override;
-	virtual bool StartDialog() override;
-	virtual bool StopDialog() override;
-	virtual bool CheckDialog() override;
-	virtual void DialogAudioPermissions() override;
-	virtual bool StartTts(FString TtsText) override;
-	virtual bool QuitTts() override;
-	virtual bool CancelTts() override;
-	virtual bool PauseTts() override;
-	virtual bool ResumeTts() override;
-	virtual bool CheckTts() override;
+	GENERATED_BODY()
+
+public:
+	UAndroidNuiDialogUtils();
+	virtual ~UAndroidNuiDialogUtils();
+	virtual void InitNuiSpeech_Implementation() override;
+	virtual void ReleaseNuiSpeech_Implementation() override;
+	
+	virtual bool StartDialog_Implementation() override;
+	virtual bool StopDialog_Implementation() override;
+	virtual bool CheckDialog_Implementation() override;
+	virtual void ReleaseDialog_Implementation() override;
+	virtual void DialogAudioPermissions_Implementation() override;
 };
 
-#endif
+UCLASS()
+class PLATFORMUTILS_API UAndroidNuiTtsUtils : public UNuiTtsUtilsBase
+{
+	GENERATED_BODY()
+
+public:
+	UAndroidNuiTtsUtils();
+    virtual ~UAndroidNuiTtsUtils();
+	virtual void InitNuiSpeech_Implementation() override;
+	virtual void ReleaseNuiSpeech_Implementation() override;
+	
+	virtual bool CancelTts_Implementation() override;
+	virtual bool CheckTts_Implementation() override;
+	virtual bool PauseTts_Implementation() override;
+	virtual bool QuitTts_Implementation() override;
+	virtual void ReleaseTts_Implementation() override;
+	virtual bool ResumeTts_Implementation() override;
+	virtual void SetFontNameTts_Implementation() override;
+	virtual bool StartTts_Implementation(FString TtsText) override;
+};

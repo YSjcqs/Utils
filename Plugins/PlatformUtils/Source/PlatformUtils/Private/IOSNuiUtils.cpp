@@ -3,62 +3,37 @@
 
 #include "IOSNuiUtils.h"
 
-void FIOSNuiUtils::InitNuiSpeech()
+void UIOSNuiDialogUtils::InitNuiSpeech_Implementation()
 {
-	FGenericPlatformNuiUtils::InitNuiSpeech();
+	Super::InitNuiSpeech_Implementation();
 }
 
-void FIOSNuiUtils::ReleaseNuiSpeech()
+void UIOSNuiDialogUtils::ReleaseNuiSpeech_Implementation()
 {
-	FGenericPlatformNuiUtils::ReleaseNuiSpeech();
+	Super::ReleaseNuiSpeech_Implementation();
 }
 
-bool FIOSNuiUtils::StartDialog()
+bool UIOSNuiDialogUtils::StartDialog_Implementation()
 {
-	return FGenericPlatformNuiUtils::StartDialog();
+	return Super::StartDialog_Implementation();
 }
 
-bool FIOSNuiUtils::StopDialog()
+bool UIOSNuiDialogUtils::StopDialog_Implementation()
 {
-	return FGenericPlatformNuiUtils::StopDialog();
+	return Super::StopDialog_Implementation();
 }
 
-bool FIOSNuiUtils::CheckDialog()
+bool UIOSNuiDialogUtils::CheckDialog_Implementation()
 {
-	return FGenericPlatformNuiUtils::CheckDialog();
+	return Super::CheckDialog_Implementation();
 }
 
-void FIOSNuiUtils::DialogAudioPermissions()
+void UIOSNuiDialogUtils::ReleaseDialog_Implementation()
 {
-	FGenericPlatformNuiUtils::DialogAudioPermissions();
+	Super::ReleaseDialog_Implementation();
 }
 
-bool FIOSNuiUtils::StartTts(FString TtsText)
+void UIOSNuiDialogUtils::DialogAudioPermissions_Implementation()
 {
-	return FGenericPlatformNuiUtils::StartTts(TtsText);
-}
-
-bool FIOSNuiUtils::QuitTts()
-{
-	return FGenericPlatformNuiUtils::QuitTts();
-}
-
-bool FIOSNuiUtils::CancelTts()
-{
-	return FGenericPlatformNuiUtils::CancelTts();
-}
-
-bool FIOSNuiUtils::PauseTts()
-{
-	return FGenericPlatformNuiUtils::PauseTts();
-}
-
-bool FIOSNuiUtils::ResumeTts()
-{
-	return FGenericPlatformNuiUtils::ResumeTts();
-}
-
-bool FIOSNuiUtils::CheckTts()
-{
-	return FGenericPlatformNuiUtils::CheckTts();
+	Super::DialogAudioPermissions_Implementation();
 }

@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "NuiUtilsHeader.h"
 #include "Modules/ModuleManager.h"
 
+class UNuiUtils;
 class PLATFORMUTILS_API FPlatformUtilsModule : public IModuleInterface
 {
 public:
@@ -13,9 +13,4 @@ public:
 	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
-
-	TSharedPtr<FNuiUtils> GetNuiUtils();
-
-private:
-	TSharedPtr<FNuiUtils> NuiUtilsInstance = nullptr;
 };
