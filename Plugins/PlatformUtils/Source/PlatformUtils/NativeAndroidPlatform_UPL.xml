@@ -33,7 +33,7 @@ import com.epicgames.unreal.speechrec.NuiSpeechManager;
     private NuiSpeechManager SpeechManager = new NuiSpeechManager();
 
 	public void initNuiSdk(String app_key, String accessKeyId, String accessKeySecret) {
-		SpeechManager.initialize(this, app_key, app_key, accessKeySecret);
+		SpeechManager.initialize(this, app_key, accessKeyId, accessKeySecret);
 	}
 
 	public void releaseNuiSdk() {

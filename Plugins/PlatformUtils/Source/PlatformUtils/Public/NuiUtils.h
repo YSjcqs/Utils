@@ -3,8 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/Object.h"
-#include "NuiUtils.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogNuiDebug, Log, All);
 
@@ -113,125 +111,28 @@ enum class ETtsEvent : uint8
 	TTS_EVENT_ERROR = 5
 };
 
-// package com.epicgames.unreal.speechrec;->NuiSpeechManager
-// public static native void DialogEventCallback(int NuiEvent, int resultCode, String asrString);
-// public static native void DialogAudioStateChanged(int var1);
-// public static native void DialogAudioRMSChanged(float var1);
-// public static native void DialogVprEventCallback(int var1);
-//
-// public static native void TtsEventCallback(int var1, String var2, int var3);
-// public static native void TtsVolCallback(int var1);
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FDialogEventCallbackDelegate, ENuiEvent, NuiEvent, int, ResultCode, FString, AsrString);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDialogAudioStateChangedDelegate, EAudioState, AudioState);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDialogAudioRMSChangedDelegate, float, Value);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDialogVprEventCallbackDelegate, ENuiVprEvent, NuiVprEvent);
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FTtsEventCallbackDelegate, ETtsEvent, TtsEvent, FString, TaskID, int, ResultCode);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTtsVolCallbackDelegate, int, Value);
-
-
-UCLASS(Abstract)
-class PLATFORMUTILS_API UNuiUtils : public UObject
+class FNuiUtilsBase
 {
-	GENERATED_BODY()
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Nui")
-	void InitNuiSpeech();
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Nui")
-	void ReleaseNuiSpeech();
+	FNuiUtilsBase() { }
+	virtual ~FNuiUtilsBase() { }
 
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Access")
-	FString AppKey = TEXT("J8PkaDSNkxymRdPh");
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Access")
-	FString AccessKeyId = TEXT("LTAI5tQqNzJRwYnMMinoAuUN");
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Access")
-	FString AccessKeySecret = TEXT("R9wuHhUQmocckKPIAS3HxXuLqIeWUw");
-};
+	virtual void InitNuiSpeech(FString AppKey, FString AccessKeyId, FString AccessKeySecret) { }
+	virtual void ReleaseNuiSpeech() { }
 
-UCLASS()
-class PLATFORMUTILS_API UNuiDialogUtilsBase : public UNuiUtils
-{
-	GENERATED_BODY()
-public:
-	FORCEINLINE void OnDialogEventCallback(ENuiEvent NuiEvent, int ResultCode, FString AsrString)
-	{
-		DialogEventCallbackDelegate.Broadcast(NuiEvent, ResultCode, AsrString);
-	}
+	virtual bool StartDialog() { return false; }
+	virtual bool StopDialog() { return false; }
+	virtual bool CheckDialog() { return false; }
+	virtual void ReleaseDialog() { }
+	virtual void DialogAudioPermissions() { }
 
-	FORCEINLINE void OnDialogAudioStateChanged(EAudioState AudioState)
-	{
-		DialogAudioStateChangedDelegate.Broadcast(AudioState);
-	}
+	virtual bool StartTts(FString TtsText) { return false; }
+	virtual bool QuitTts() { return false; }
+	virtual bool CancelTts() { return false; }
+	virtual bool PauseTts() { return false; }
+	virtual bool ResumeTts() { return false; }
+	virtual bool CheckTts() { return false; }
 
-	FORCEINLINE void OnDialogAudioRMSChanged(float Value)
-	{
-		DialogAudioRmsChangedDelegate.Broadcast(Value);
-	}
-
-	FORCEINLINE void OnDialogVprEventCallback(ENuiVprEvent NuiVprEvent)
-	{
-		DialogVprEventCallbackDelegate.Broadcast(NuiVprEvent);
-	}
-	
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Nui|Dialog")
-	bool StartDialog();
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Nui|Dialog")
-	bool StopDialog();
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Nui|Dialog")
-	bool CheckDialog();
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Nui|Dialog")
-	void ReleaseDialog();
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Nui|Dialog")
-	void DialogAudioPermissions();
-
-	UPROPERTY(BlueprintAssignable)
-	FDialogEventCallbackDelegate DialogEventCallbackDelegate;
-	UPROPERTY(BlueprintAssignable)
-	FDialogAudioStateChangedDelegate DialogAudioStateChangedDelegate;
-	UPROPERTY(BlueprintAssignable)
-	FDialogAudioRMSChangedDelegate DialogAudioRmsChangedDelegate;
-	UPROPERTY(BlueprintAssignable)
-	FDialogVprEventCallbackDelegate DialogVprEventCallbackDelegate;
-};
-
-
-UCLASS()
-class PLATFORMUTILS_API UNuiTtsUtilsBase : public UNuiUtils
-{
-	GENERATED_BODY()
-public:
-
-	FORCEINLINE void OnTtsEventCallback(ETtsEvent TtsEvent, FString TaskID, int ResultCode)
-	{
-		TtsEventCallbackDelegate.Broadcast(TtsEvent, TaskID, ResultCode);
-	}
-
-	FORCEINLINE void OnTtsVolCallback(int Vol)
-	{
-		TtsVolCallbackDelegate.Broadcast(Vol);
-	}
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Nui|Tts")
-	bool StartTts(FString TtsText);
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Nui|Tts")
-	bool QuitTts();
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Nui|Tts")
-	bool CancelTts();
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Nui|Tts")
-	bool PauseTts();
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Nui|Tts")
-	bool ResumeTts();
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Nui|Tts")
-	bool CheckTts();
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Nui|Tts")
-	void ReleaseTts();
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Nui|Tts")
-	void SetFontNameTts();
-	
-	UPROPERTY(BlueprintAssignable)
-	FTtsEventCallbackDelegate TtsEventCallbackDelegate;
-	UPROPERTY(BlueprintAssignable)
-	FTtsVolCallbackDelegate TtsVolCallbackDelegate;
+	virtual void ReleaseTts() { }
+	virtual void SetFontNameTts() { }
 };

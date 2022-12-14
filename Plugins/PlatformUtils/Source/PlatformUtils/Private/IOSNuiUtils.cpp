@@ -1,39 +1,66 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+#if PLATFORM_IOS
 
 #include "IOSNuiUtils.h"
 
-void UIOSNuiDialogUtils::InitNuiSpeech_Implementation()
+void FIOSNuiUtils::InitNuiSpeech(FString AppKey, FString AccessKeyId, FString AccessKeySecret)
 {
-	Super::InitNuiSpeech_Implementation();
 }
 
-void UIOSNuiDialogUtils::ReleaseNuiSpeech_Implementation()
+void FIOSNuiUtils::ReleaseNuiSpeech()
 {
-	Super::ReleaseNuiSpeech_Implementation();
 }
 
-bool UIOSNuiDialogUtils::StartDialog_Implementation()
+bool FIOSNuiUtils::StartDialog()
 {
-	return Super::StartDialog_Implementation();
 }
 
-bool UIOSNuiDialogUtils::StopDialog_Implementation()
+bool FIOSNuiUtils::StopDialog()
 {
-	return Super::StopDialog_Implementation();
 }
 
-bool UIOSNuiDialogUtils::CheckDialog_Implementation()
+bool FIOSNuiUtils::CheckDialog()
 {
-	return Super::CheckDialog_Implementation();
 }
 
-void UIOSNuiDialogUtils::ReleaseDialog_Implementation()
+void FIOSNuiUtils::ReleaseDialog()
 {
-	Super::ReleaseDialog_Implementation();
 }
 
-void UIOSNuiDialogUtils::DialogAudioPermissions_Implementation()
+void FIOSNuiUtils::DialogAudioPermissions()
 {
-	Super::DialogAudioPermissions_Implementation();
 }
+
+bool FIOSNuiUtils::StartTts(FString TtsText)
+{
+}
+
+bool FIOSNuiUtils::QuitTts()
+{
+}
+
+bool FIOSNuiUtils::CancelTts()
+{
+}
+
+bool FIOSNuiUtils::PauseTts()
+{
+}
+
+bool FIOSNuiUtils::ResumeTts()
+{
+}
+
+bool FIOSNuiUtils::CheckTts()
+{
+}
+
+void FIOSNuiUtils::ReleaseTts()
+{
+}
+
+void FIOSNuiUtils::SetFontNameTts()
+{
+}
+
+#endif

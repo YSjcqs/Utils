@@ -1,14 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+#if PLATFORM_ANDROID
 
 #include "AndroidNuiUtils.h"
 #include "Android/AndroidJNI.h"
 #include "Android/AndroidApplication.h"
-#include "PlatformUtils.h"
+#include "NuiInstance.h"
 
 static JNIEnv* gEnv = nullptr;
-static UAndroidNuiDialogUtils* gAndroidDialogUtils = nullptr;
-static UAndroidNuiTtsUtils* gAndroidTtsUtils = nullptr;
 static jmethodID gMidInitNuiSpeech;
 static jmethodID gMidReleaseNuiSpeech;
 
@@ -27,42 +25,55 @@ static jmethodID gMidCheckTts;
 static jmethodID gMidReleaseTts;
 static jmethodID gMidSetFontNameTts;
 
-static void InitEnv()
+FAndroidNuiUtils::FAndroidNuiUtils()
 {
-	if (!gEnv)
-	{
-		bool bIsOptional = false;
-		gEnv = FAndroidApplication::GetJavaEnv();
-		if (gEnv)
-		{
-			gMidInitNuiSpeech = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "initNuiSdk",
-				"(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V", bIsOptional);
-			gMidReleaseNuiSpeech = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "releaseNuiSdk", "()V", bIsOptional);
-		}
-	}
-}
-
-UAndroidNuiDialogUtils::UAndroidNuiDialogUtils()
-{
-	InitEnv();
+	gEnv = FAndroidApplication::GetJavaEnv();
 	if (gEnv)
 	{
-		gAndroidDialogUtils = this;
 		bool bIsOptional = false;
-		gMidStartDialog = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "startDialog", "()Z", bIsOptional);
-		gMidStopDialog = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "stopDialog", "()Z", bIsOptional);
-		gMidCheckDialog = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "checkDialog", "()Z", bIsOptional);
-		gMidReleaseDialog = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "releaseDialog", "()V", bIsOptional);
-		gMidDialogAudioPermissions = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "dialogAudioPermissions", "()V", bIsOptional);
+
+		gMidInitNuiSpeech = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "initNuiSdk",
+		                                             "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+		                                             bIsOptional);
+		gMidReleaseNuiSpeech = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "releaseNuiSdk", "()V",
+		                                                bIsOptional);
+
+		gMidStartDialog = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "startDialog", "()Z",
+		                                           bIsOptional);
+		gMidStopDialog = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "stopDialog", "()Z",
+		                                          bIsOptional);
+		gMidCheckDialog = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "checkDialog", "()Z",
+		                                           bIsOptional);
+		gMidReleaseDialog = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "releaseDialog", "()V",
+		                                             bIsOptional);
+		gMidDialogAudioPermissions = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID,
+		                                                      "dialogAudioPermissions", "()V", bIsOptional);
+
+		gMidStartTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "startTts",
+		                                        "(Ljava/lang/String;)Z", bIsOptional);
+		gMidQuitTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "quitTts", "()Z", bIsOptional);
+		gMidCancelTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "cancelTts", "()Z",
+		                                         bIsOptional);
+		gMidPauseTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "pauseTts", "()Z",
+		                                        bIsOptional);
+		gMidResumeTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "resumeTts", "()Z",
+		                                         bIsOptional);
+		gMidCheckTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "checkTts", "()Z",
+		                                        bIsOptional);
+		gMidReleaseTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "releaseTts", "()V",
+		                                          bIsOptional);
+		gMidSetFontNameTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "setFontName",
+		                                              "(Ljava/lang/String;)V", bIsOptional);
 	}
 }
 
-UAndroidNuiDialogUtils::~UAndroidNuiDialogUtils()
+FAndroidNuiUtils::~FAndroidNuiUtils()
 {
-	gAndroidDialogUtils = nullptr;
+	gEnv = nullptr;
 }
 
-void UAndroidNuiDialogUtils::InitNuiSpeech_Implementation()
+
+void FAndroidNuiUtils::InitNuiSpeech(FString AppKey, FString AccessKeyId, FString AccessKeySecret)
 {
 	if (gEnv)
 	{
@@ -70,11 +81,11 @@ void UAndroidNuiDialogUtils::InitNuiSpeech_Implementation()
 		auto accessKeyId = FJavaHelper::ToJavaString(gEnv, AccessKeyId);
 		auto accessKeySecret = FJavaHelper::ToJavaString(gEnv, AccessKeySecret);
 		FJavaWrapper::CallVoidMethod(gEnv, FJavaWrapper::GameActivityThis,
-										   gMidInitNuiSpeech, *app_key, *accessKeyId, *accessKeySecret);
+		                             gMidInitNuiSpeech, *app_key, *accessKeyId, *accessKeySecret);
 	}
 }
 
-void UAndroidNuiDialogUtils::ReleaseNuiSpeech_Implementation()
+void FAndroidNuiUtils::ReleaseNuiSpeech()
 {
 	if (gEnv)
 	{
@@ -82,16 +93,16 @@ void UAndroidNuiDialogUtils::ReleaseNuiSpeech_Implementation()
 	}
 }
 
-bool UAndroidNuiDialogUtils::CheckDialog_Implementation()
+bool FAndroidNuiUtils::CheckDialog()
 {
 	if (gEnv)
 	{
 		return FJavaWrapper::CallBooleanMethod(gEnv, FJavaWrapper::GameActivityThis, gMidCheckDialog);
 	}
-	return FGenericPlatformNuiUtils::CheckDialog();
+	return FNuiUtilsBase::CheckDialog();
 }
 
-void UAndroidNuiDialogUtils::ReleaseDialog_Implementation()
+void FAndroidNuiUtils::ReleaseDialog()
 {
 	if (gEnv)
 	{
@@ -99,7 +110,7 @@ void UAndroidNuiDialogUtils::ReleaseDialog_Implementation()
 	}
 }
 
-void UAndroidNuiDialogUtils::DialogAudioPermissions_Implementation()
+void FAndroidNuiUtils::DialogAudioPermissions()
 {
 	if (gEnv)
 	{
@@ -107,7 +118,7 @@ void UAndroidNuiDialogUtils::DialogAudioPermissions_Implementation()
 	}
 }
 
-bool UAndroidNuiDialogUtils::StartDialog_Implementation()
+bool FAndroidNuiUtils::StartDialog()
 {
 	if (gEnv)
 	{
@@ -116,7 +127,7 @@ bool UAndroidNuiDialogUtils::StartDialog_Implementation()
 	return false;
 }
 
-bool UAndroidNuiDialogUtils::StopDialog_Implementation()
+bool FAndroidNuiUtils::StopDialog()
 {
 	if (gEnv)
 	{
@@ -125,50 +136,7 @@ bool UAndroidNuiDialogUtils::StopDialog_Implementation()
 	return false;
 }
 
-UAndroidNuiTtsUtils::UAndroidNuiTtsUtils()
-{
-	InitEnv();
-	if (gEnv)
-	{
-		gAndroidTtsUtils = this;
-		bool bIsOptional = false;
-		gMidStartTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "startTts", "(Ljava/lang/String;)Z", bIsOptional);
-		gMidQuitTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "quitTts", "()Z", bIsOptional);
-		gMidCancelTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "cancelTts", "()Z", bIsOptional);
-		gMidPauseTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "pauseTts", "()Z", bIsOptional);
-		gMidResumeTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "resumeTts", "()Z", bIsOptional);
-		gMidCheckTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "checkTts", "()Z", bIsOptional);
-		gMidReleaseTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "releaseTts", "()V", bIsOptional);
-		gMidSetFontNameTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "setFontName", "(Ljava/lang/String;)V", bIsOptional);
-	}
-}
-
-UAndroidNuiTtsUtils::~UAndroidNuiTtsUtils()
-{
-	gAndroidTtsUtils = nullptr;
-}
-
-void UAndroidNuiTtsUtils::InitNuiSpeech_Implementation()
-{
-	if (gEnv)
-	{
-		auto app_key = FJavaHelper::ToJavaString(gEnv, AppKey);
-		auto accessKeyId = FJavaHelper::ToJavaString(gEnv, AccessKeyId);
-		auto accessKeySecret = FJavaHelper::ToJavaString(gEnv, AccessKeySecret);
-		FJavaWrapper::CallVoidMethod(gEnv, FJavaWrapper::GameActivityThis,
-										   gMidInitNuiSpeech, *app_key, *accessKeyId, *accessKeySecret);
-	}
-}
-
-void UAndroidNuiTtsUtils::ReleaseNuiSpeech_Implementation()
-{
-	if (gEnv)
-	{
-		FJavaWrapper::CallVoidMethod(gEnv, FJavaWrapper::GameActivityThis, gMidReleaseNuiSpeech);
-	}
-}
-
-void UAndroidNuiTtsUtils::ReleaseTts_Implementation()
+void FAndroidNuiUtils::ReleaseTts()
 {
 	if (gEnv)
 	{
@@ -176,130 +144,126 @@ void UAndroidNuiTtsUtils::ReleaseTts_Implementation()
 	}
 }
 
-bool UAndroidNuiTtsUtils::StartTts_Implementation(FString TtsText)
+bool FAndroidNuiUtils::StartTts(FString TtsText)
 {
 	if (gEnv)
 	{
 		return FJavaWrapper::CallBooleanMethod(gEnv, FJavaWrapper::GameActivityThis, gMidStartTts);
 	}
-	return FGenericPlatformNuiUtils::StartTts(TtsText);
+	return false;
 }
 
-bool UAndroidNuiTtsUtils::QuitTts_Implementation()
+bool FAndroidNuiUtils::QuitTts()
 {
 	if (gEnv)
 	{
 		return FJavaWrapper::CallBooleanMethod(gEnv, FJavaWrapper::GameActivityThis, gMidQuitTts);
 	}
-	return FGenericPlatformNuiUtils::QuitTts();
+	return false;
 }
 
-bool UAndroidNuiTtsUtils::CancelTts_Implementation()
+bool FAndroidNuiUtils::CancelTts()
 {
 	if (gEnv)
 	{
 		return FJavaWrapper::CallBooleanMethod(gEnv, FJavaWrapper::GameActivityThis, gMidCancelTts);
 	}
-	return FGenericPlatformNuiUtils::CancelTts();
+	return false;
 }
 
-bool UAndroidNuiTtsUtils::PauseTts_Implementation()
+bool FAndroidNuiUtils::PauseTts()
 {
 	if (gEnv)
 	{
 		return FJavaWrapper::CallBooleanMethod(gEnv, FJavaWrapper::GameActivityThis, gMidPauseTts);
 	}
-	return FGenericPlatformNuiUtils::PauseTts();
+	return false;
 }
 
-bool UAndroidNuiTtsUtils::ResumeTts_Implementation()
+bool FAndroidNuiUtils::ResumeTts()
 {
 	if (gEnv)
 	{
 		return FJavaWrapper::CallBooleanMethod(gEnv, FJavaWrapper::GameActivityThis, gMidResumeTts);
 	}
-	return FGenericPlatformNuiUtils::ResumeTts();
+	return false;
 }
 
-bool UAndroidNuiTtsUtils::CheckTts_Implementation()
+bool FAndroidNuiUtils::CheckTts()
 {
 	if (gEnv)
 	{
 		return FJavaWrapper::CallBooleanMethod(gEnv, FJavaWrapper::GameActivityThis, gMidCheckTts);
 	}
-	return FGenericPlatformNuiUtils::CheckTts();
+	return false;
 }
 
-void UAndroidNuiTtsUtils::SetFontNameTts_Implementation()
+void FAndroidNuiUtils::SetFontNameTts()
 {
-#if PLATFORM_ANDROID
 	if (gEnv)
 	{
 		FJavaWrapper::CallBooleanMethod(gEnv, FJavaWrapper::GameActivityThis, gMidSetFontNameTts);
 	}
-#endif
 }
 
-#if PLATFORM_ANDROID
-extern "C"
-{
+extern "C" {
 JNI_METHOD void Java_com_epicgames_unreal_speechrec_NuiSpeechManager_DialogEventCallback(
 	JNIEnv* jenv, jobject thiz, jint NuiEvent, jint resultCode, jstring asrString)
 {
-	if (gAndroidDialogUtils)
+	if (UNuiInstance::GetNuiInstance())
 	{
 		ENuiEvent eNuiEvent = static_cast<ENuiEvent>(NuiEvent);
-		gAndroidDialogUtils->OnDialogEventCallback(eNuiEvent, static_cast<int>(resultCode),
-			FJavaHelper::FStringFromLocalRef(jenv, asrString));
+		UNuiInstance::GetNuiInstance()->OnDialogEventCallback(eNuiEvent, static_cast<int>(resultCode),
+		                                                      FJavaHelper::FStringFromLocalRef(jenv, asrString));
 	}
 }
 
 JNI_METHOD void Java_com_epicgames_unreal_speechrec_NuiSpeechManager_DialogAudioStateChanged(
 	JNIEnv* jenv, jobject thiz, jint var1)
 {
-	if (gAndroidDialogUtils)
+	if (UNuiInstance::GetNuiInstance())
 	{
-		gAndroidDialogUtils->OnDialogAudioStateChanged(static_cast<EAudioState>(var1));
+		UNuiInstance::GetNuiInstance()->OnDialogAudioStateChanged(static_cast<EAudioState>(var1));
 	}
 }
 
 JNI_METHOD void Java_com_epicgames_unreal_speechrec_NuiSpeechManager_DialogAudioRMSChanged(
 	JNIEnv* jenv, jobject thiz, jfloat var1)
 {
-	if (gAndroidDialogUtils)
+	if (UNuiInstance::GetNuiInstance())
 	{
-		gAndroidDialogUtils->OnDialogAudioRMSChanged(static_cast<float>(var1));
+		UNuiInstance::GetNuiInstance()->OnDialogAudioRMSChanged(static_cast<float>(var1));
 	}
 }
 
 JNI_METHOD void Java_com_epicgames_unreal_speechrec_NuiSpeechManager_DialogVprEventCallback(
 	JNIEnv* jenv, jobject thiz, jint var1)
 {
-	if (gAndroidDialogUtils)
+	if (UNuiInstance::GetNuiInstance())
 	{
-		gAndroidDialogUtils->OnDialogVprEventCallback(static_cast<ENuiVprEvent>(var1));
+		UNuiInstance::GetNuiInstance()->OnDialogVprEventCallback(static_cast<ENuiVprEvent>(var1));
 	}
 }
 
 JNI_METHOD void Java_com_epicgames_unreal_speechrec_NuiSpeechManager_TtsEventCallback(
 	JNIEnv* jenv, jobject thiz, jint TtsEvent, jstring taskID, jint resultCode)
 {
-	if (gAndroidTtsUtils)
+	if (UNuiInstance::GetNuiInstance())
 	{
 		ETtsEvent eTtsEvent = static_cast<ETtsEvent>(TtsEvent);
-		gAndroidTtsUtils->OnTtsEventCallback(eTtsEvent, FJavaHelper::FStringFromLocalRef(jenv, taskID),
-			static_cast<int>(resultCode));
+		UNuiInstance::GetNuiInstance()->OnTtsEventCallback(eTtsEvent, FJavaHelper::FStringFromLocalRef(jenv, taskID),
+		                                                   static_cast<int>(resultCode));
 	}
 }
 
 JNI_METHOD void Java_com_epicgames_unreal_speechrec_NuiSpeechManager_TtsVolCallback(
 	JNIEnv* jenv, jobject thiz, jint var1)
 {
-	if (gAndroidTtsUtils)
+	if (UNuiInstance::GetNuiInstance())
 	{
-		gAndroidTtsUtils->OnTtsVolCallback(static_cast<int>(var1));
+		UNuiInstance::GetNuiInstance()->OnTtsVolCallback(static_cast<int>(var1));
 	}
 }
-
 }
+
 #endif
