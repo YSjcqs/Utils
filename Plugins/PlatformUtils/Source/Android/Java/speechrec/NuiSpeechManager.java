@@ -85,10 +85,10 @@ public class NuiSpeechManager {
         return str;
     }
 
-    public static native void NuiEventCallback(int NuiEvent, int resultCode, String asrString);
-    public static native void NuiAudioStateChanged(int var1);
-    public static native void NuiAudioRMSChanged(float var1);
-    public static native void NuiVprEventCallback(int var1);
+    public static native void DialogEventCallback(int NuiEvent, int resultCode, String asrString);
+    public static native void DialogAudioStateChanged(int var1);
+    public static native void DialogAudioRMSChanged(float var1);
+    public static native void DialogVprEventCallback(int var1);
 
     public static native void TtsEventCallback(int var1, String var2, int var3);
     public static native void TtsVolCallback(int var1);

@@ -143,7 +143,7 @@ public class NuiSpeechTranscriber implements INativeNuiCallback {
             SpeechTextCache = "";
         }
         try {
-            NuiSpeechManager.NuiEventCallback(event.ordinal(), resultCode, SpeechTextCache);
+            NuiSpeechManager.DialogEventCallback(event.ordinal(), resultCode, SpeechTextCache);
         }catch (Exception ex) {
             ex.printStackTrace();
             Log.error(ex.getMessage());
@@ -179,7 +179,7 @@ public class NuiSpeechTranscriber implements INativeNuiCallback {
             mAudioRecorder.stop();
         }
         try {
-            NuiSpeechManager.NuiAudioStateChanged(state.ordinal());
+            NuiSpeechManager.DialogAudioStateChanged(state.ordinal());
         }catch (Exception ex) {
             ex.printStackTrace();
             Log.error(ex.getMessage());
@@ -190,7 +190,7 @@ public class NuiSpeechTranscriber implements INativeNuiCallback {
     public void onNuiAudioRMSChanged(float val) {
         Log.debug("onNuiAudioRMSChanged vol " + val);
         try {
-            NuiSpeechManager.NuiAudioRMSChanged(val);
+            NuiSpeechManager.DialogAudioRMSChanged(val);
         }catch (Exception ex) {
             ex.printStackTrace();
             Log.error(ex.getMessage());
@@ -201,7 +201,7 @@ public class NuiSpeechTranscriber implements INativeNuiCallback {
     public void onNuiVprEventCallback(Constants.NuiVprEvent event) {
         Log.debug("onNuiVprEventCallback event " + event);
         try {
-            NuiSpeechManager.NuiVprEventCallback(event.ordinal());
+            NuiSpeechManager.DialogVprEventCallback(event.ordinal());
         }catch (Exception ex) {
             ex.printStackTrace();
             Log.error(ex.getMessage());
