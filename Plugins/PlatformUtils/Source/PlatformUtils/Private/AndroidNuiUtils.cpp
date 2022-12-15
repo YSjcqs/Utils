@@ -15,6 +15,7 @@ static jmethodID gMidStopDialog;
 static jmethodID gMidCheckDialog;
 static jmethodID gMidReleaseDialog;
 static jmethodID gMidDialogAudioPermissions;
+static jmethodID gMidGetCurrentHandleCode;
 
 static jmethodID gMidStartTts;
 static jmethodID gMidQuitTts;
@@ -38,32 +39,34 @@ FAndroidNuiUtils::FAndroidNuiUtils()
 		gMidReleaseNuiSpeech = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "releaseNuiSdk", "()V",
 		                                                bIsOptional);
 
-		gMidStartDialog = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "startDialog", "()Z",
+		gMidStartDialog = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "startDialog", "()V",
 		                                           bIsOptional);
-		gMidStopDialog = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "stopDialog", "()Z",
+		gMidStopDialog = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "stopDialog", "()V",
 		                                          bIsOptional);
 		gMidCheckDialog = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "checkDialog", "()Z",
 		                                           bIsOptional);
-		gMidReleaseDialog = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "releaseDialog", "()V",
+		gMidReleaseDialog = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "releaseDialog", "()I",
 		                                             bIsOptional);
 		gMidDialogAudioPermissions = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID,
 		                                                      "dialogAudioPermissions", "()V", bIsOptional);
+		gMidGetCurrentHandleCode = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "getCurrentHandleCode", "()I",
+													 bIsOptional);
 
 		gMidStartTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "startTts",
-		                                        "(Ljava/lang/String;)Z", bIsOptional);
-		gMidQuitTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "quitTts", "()Z", bIsOptional);
-		gMidCancelTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "cancelTts", "()Z",
+		                                        "(Ljava/lang/String;)I", bIsOptional);
+		gMidQuitTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "quitTts", "()I", bIsOptional);
+		gMidCancelTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "cancelTts", "()I",
 		                                         bIsOptional);
-		gMidPauseTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "pauseTts", "()Z",
+		gMidPauseTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "pauseTts", "()I",
 		                                        bIsOptional);
-		gMidResumeTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "resumeTts", "()Z",
+		gMidResumeTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "resumeTts", "()I",
 		                                         bIsOptional);
 		gMidCheckTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "checkTts", "()Z",
 		                                        bIsOptional);
-		gMidReleaseTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "releaseTts", "()V",
+		gMidReleaseTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "releaseTts", "()I",
 		                                          bIsOptional);
 		gMidSetFontNameTts = FJavaWrapper::FindMethod(gEnv, FJavaWrapper::GameActivityClassID, "setFontName",
-		                                              "(Ljava/lang/String;)V", bIsOptional);
+		                                              "(Ljava/lang/String;)I", bIsOptional);
 	}
 }
 
@@ -99,15 +102,16 @@ bool FAndroidNuiUtils::CheckDialog()
 	{
 		return FJavaWrapper::CallBooleanMethod(gEnv, FJavaWrapper::GameActivityThis, gMidCheckDialog);
 	}
-	return FNuiUtilsBase::CheckDialog();
+	return false;
 }
 
-void FAndroidNuiUtils::ReleaseDialog()
+int FAndroidNuiUtils::ReleaseDialog()
 {
 	if (gEnv)
 	{
-		FJavaWrapper::CallVoidMethod(gEnv, FJavaWrapper::GameActivityThis, gMidReleaseDialog);
+		return FJavaWrapper::CallIntMethod(gEnv, FJavaWrapper::GameActivityThis, gMidReleaseDialog);
 	}
+	return -1;
 }
 
 void FAndroidNuiUtils::DialogAudioPermissions()
@@ -118,75 +122,84 @@ void FAndroidNuiUtils::DialogAudioPermissions()
 	}
 }
 
-bool FAndroidNuiUtils::StartDialog()
+int FAndroidNuiUtils::GetCurrentHandleCode()
 {
 	if (gEnv)
 	{
-		return FJavaWrapper::CallBooleanMethod(gEnv, FJavaWrapper::GameActivityThis, gMidStartDialog);
+		return FJavaWrapper::CallIntMethod(gEnv, FJavaWrapper::GameActivityThis, gMidGetCurrentHandleCode);
 	}
-	return false;
+	return -1;
 }
 
-bool FAndroidNuiUtils::StopDialog()
+void FAndroidNuiUtils::StartDialog()
 {
 	if (gEnv)
 	{
-		return FJavaWrapper::CallBooleanMethod(gEnv, FJavaWrapper::GameActivityThis, gMidStopDialog);
-	}
-	return false;
-}
-
-void FAndroidNuiUtils::ReleaseTts()
-{
-	if (gEnv)
-	{
-		FJavaWrapper::CallVoidMethod(gEnv, FJavaWrapper::GameActivityThis, gMidReleaseTts);
+		FJavaWrapper::CallVoidMethod(gEnv, FJavaWrapper::GameActivityThis, gMidStartDialog);
 	}
 }
 
-bool FAndroidNuiUtils::StartTts(FString TtsText)
+void FAndroidNuiUtils::StopDialog()
 {
 	if (gEnv)
 	{
-		return FJavaWrapper::CallBooleanMethod(gEnv, FJavaWrapper::GameActivityThis, gMidStartTts);
+		FJavaWrapper::CallVoidMethod(gEnv, FJavaWrapper::GameActivityThis, gMidStopDialog);
 	}
-	return false;
 }
 
-bool FAndroidNuiUtils::QuitTts()
+int FAndroidNuiUtils::ReleaseTts()
 {
 	if (gEnv)
 	{
-		return FJavaWrapper::CallBooleanMethod(gEnv, FJavaWrapper::GameActivityThis, gMidQuitTts);
+		return FJavaWrapper::CallIntMethod(gEnv, FJavaWrapper::GameActivityThis, gMidReleaseTts);
 	}
-	return false;
+	return -1;
 }
 
-bool FAndroidNuiUtils::CancelTts()
+int FAndroidNuiUtils::StartTts(FString TtsText)
 {
 	if (gEnv)
 	{
-		return FJavaWrapper::CallBooleanMethod(gEnv, FJavaWrapper::GameActivityThis, gMidCancelTts);
+		auto jText = FJavaHelper::ToJavaString(gEnv, TtsText);
+		return FJavaWrapper::CallIntMethod(gEnv, FJavaWrapper::GameActivityThis, gMidStartTts, *jText);
 	}
-	return false;
+	return -1;
 }
 
-bool FAndroidNuiUtils::PauseTts()
+int FAndroidNuiUtils::QuitTts()
 {
 	if (gEnv)
 	{
-		return FJavaWrapper::CallBooleanMethod(gEnv, FJavaWrapper::GameActivityThis, gMidPauseTts);
+		return FJavaWrapper::CallIntMethod(gEnv, FJavaWrapper::GameActivityThis, gMidQuitTts);
 	}
-	return false;
+	return -1;
 }
 
-bool FAndroidNuiUtils::ResumeTts()
+int FAndroidNuiUtils::CancelTts()
 {
 	if (gEnv)
 	{
-		return FJavaWrapper::CallBooleanMethod(gEnv, FJavaWrapper::GameActivityThis, gMidResumeTts);
+		return FJavaWrapper::CallIntMethod(gEnv, FJavaWrapper::GameActivityThis, gMidCancelTts);
 	}
-	return false;
+	return -1;
+}
+
+int FAndroidNuiUtils::PauseTts()
+{
+	if (gEnv)
+	{
+		return FJavaWrapper::CallIntMethod(gEnv, FJavaWrapper::GameActivityThis, gMidPauseTts);
+	}
+	return -1;
+}
+
+int FAndroidNuiUtils::ResumeTts()
+{
+	if (gEnv)
+	{
+		return FJavaWrapper::CallIntMethod(gEnv, FJavaWrapper::GameActivityThis, gMidResumeTts);
+	}
+	return -1;
 }
 
 bool FAndroidNuiUtils::CheckTts()
@@ -198,12 +211,14 @@ bool FAndroidNuiUtils::CheckTts()
 	return false;
 }
 
-void FAndroidNuiUtils::SetFontNameTts()
+int FAndroidNuiUtils::SetFontNameTts(FString Name)
 {
 	if (gEnv)
 	{
-		FJavaWrapper::CallBooleanMethod(gEnv, FJavaWrapper::GameActivityThis, gMidSetFontNameTts);
+		auto jName = FJavaHelper::ToJavaString(gEnv, Name);
+		return FJavaWrapper::CallIntMethod(gEnv, FJavaWrapper::GameActivityThis, gMidSetFontNameTts, *jName);
 	}
+	return -1;
 }
 
 extern "C" {

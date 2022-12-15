@@ -36,39 +36,38 @@ void UNuiInstance::ReleaseNuiSpeech()
 	NuiUtils = nullptr;
 }
 
-bool UNuiInstance::StartDialog()
+void UNuiInstance::StartDialog()
 {
 	if (NuiUtils.IsValid())
 	{
 		NuiUtils->StartDialog();
 	}
-	return false;
 }
 
-bool UNuiInstance::StopDialog()
+void UNuiInstance::StopDialog()
 {
 	if (NuiUtils.IsValid())
 	{
 		NuiUtils->StopDialog();
 	}
-	return false;
 }
 
 bool UNuiInstance::CheckDialog()
 {
 	if (NuiUtils.IsValid())
 	{
-		NuiUtils->CheckDialog();
+		return NuiUtils->CheckDialog();
 	}
 	return false;
 }
 
-void UNuiInstance::ReleaseDialog()
+int UNuiInstance::ReleaseDialog()
 {
 	if (NuiUtils.IsValid())
 	{
-		NuiUtils->ReleaseDialog();
+		return NuiUtils->ReleaseDialog();
 	}
+	return -1;
 }
 
 void UNuiInstance::DialogAudioPermissions()
@@ -79,72 +78,83 @@ void UNuiInstance::DialogAudioPermissions()
 	}
 }
 
-bool UNuiInstance::StartTts(FString TtsText)
+int UNuiInstance::GetCurrentHandleCode()
 {
 	if (NuiUtils.IsValid())
 	{
-		NuiUtils->StartTts(TtsText);
+		return NuiUtils->GetCurrentHandleCode();
 	}
-	return false;
+	return -1;
 }
 
-bool UNuiInstance::QuitTts()
+int UNuiInstance::StartTts(FString TtsText)
 {
 	if (NuiUtils.IsValid())
 	{
-		NuiUtils->QuitTts();
+		return NuiUtils->StartTts(TtsText);
 	}
-	return false;
+	return -1;
 }
 
-bool UNuiInstance::CancelTts()
+int UNuiInstance::QuitTts()
 {
 	if (NuiUtils.IsValid())
 	{
-		NuiUtils->CancelTts();
+		return NuiUtils->QuitTts();
 	}
-	return false;
+	return -1;
 }
 
-bool UNuiInstance::PauseTts()
+int UNuiInstance::CancelTts()
 {
 	if (NuiUtils.IsValid())
 	{
-		NuiUtils->PauseTts();
+		return NuiUtils->CancelTts();
 	}
-	return false;
+	return -1;
 }
 
-bool UNuiInstance::ResumeTts()
+int UNuiInstance::PauseTts()
 {
 	if (NuiUtils.IsValid())
 	{
-		NuiUtils->ResumeTts();
+		return NuiUtils->PauseTts();
 	}
-	return false;
+	return -1;
+}
+
+int UNuiInstance::ResumeTts()
+{
+	if (NuiUtils.IsValid())
+	{
+		return NuiUtils->ResumeTts();
+	}
+	return -1;
 }
 
 bool UNuiInstance::CheckTts()
 {
 	if (NuiUtils.IsValid())
 	{
-		NuiUtils->CheckTts();
+		return NuiUtils->CheckTts();
 	}
 	return false;
 }
 
-void UNuiInstance::ReleaseTts()
+int UNuiInstance::ReleaseTts()
 {
 	if (NuiUtils.IsValid())
 	{
-		NuiUtils->ReleaseTts();
+		return NuiUtils->ReleaseTts();
 	}
+	return -1;
 }
 
-void UNuiInstance::SetFontNameTts()
+int UNuiInstance::SetFontNameTts(FString Name)
 {
 	if (NuiUtils.IsValid())
 	{
-		NuiUtils->SetFontNameTts();
+		return NuiUtils->SetFontNameTts(Name);
 	}
+	return -1;
 }

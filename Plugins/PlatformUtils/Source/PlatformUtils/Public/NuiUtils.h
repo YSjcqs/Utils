@@ -120,19 +120,20 @@ public:
 	virtual void InitNuiSpeech(FString AppKey, FString AccessKeyId, FString AccessKeySecret) { }
 	virtual void ReleaseNuiSpeech() { }
 
-	virtual bool StartDialog() { return false; }
-	virtual bool StopDialog() { return false; }
+	virtual int ReleaseDialog() { return -1; }
+	virtual void StartDialog() { }
+	virtual void StopDialog() { }
 	virtual bool CheckDialog() { return false; }
-	virtual void ReleaseDialog() { }
 	virtual void DialogAudioPermissions() { }
+	virtual int GetCurrentHandleCode() { return -1; }
 
-	virtual bool StartTts(FString TtsText) { return false; }
-	virtual bool QuitTts() { return false; }
-	virtual bool CancelTts() { return false; }
-	virtual bool PauseTts() { return false; }
-	virtual bool ResumeTts() { return false; }
+	virtual int StartTts(FString TtsText) { return -1; }
+	virtual int QuitTts() { return -1; }
+	virtual int CancelTts() { return -1; }
+	virtual int PauseTts() { return -1; }
+	virtual int ResumeTts() { return -1; }
 	virtual bool CheckTts() { return false; }
 
-	virtual void ReleaseTts() { }
-	virtual void SetFontNameTts() { }
+	virtual int ReleaseTts() { return -1; }
+	virtual int SetFontNameTts(FString Name) { return -1; }
 };

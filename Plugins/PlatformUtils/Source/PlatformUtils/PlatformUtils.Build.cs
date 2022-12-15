@@ -31,7 +31,7 @@ public class PlatformUtils : ModuleRules
 			}
 			else if(Target.Platform == UnrealTargetPlatform.IOS)
 			{
-				return Path.Combine(ThirdPartyDirectory, "nuisdk.framework", "Headers");
+				return Path.Combine(NUIBinariesDirectory, "nuisdk.framework", "Headers");
 			}
 			return Path.Combine(ThirdPartyDirectory, "Include");
 		}
@@ -108,7 +108,8 @@ public class PlatformUtils : ModuleRules
 		PublicIncludePaths.Add(ThirdPartyDirectory);
 		if(Target.Platform == UnrealTargetPlatform.IOS)
 		{
-			AdditionalPropertiesForReceipt.Add("AndroidPlugin", Path.Combine(ModuleDirectory, "NativeIOSPlatform_UPL.xml"));
+			PublicIncludePaths.Add(NUIIncludeDirectory);
+			AdditionalPropertiesForReceipt.Add("IOSPlugin", Path.Combine(ModuleDirectory, "NativeIOSPlatform_UPL.xml"));
 			PublicAdditionalFrameworks.Add(new Framework("nuisdk", NUIBinariesDirectory, "", true));
 		}
 		else if(Target.Platform == UnrealTargetPlatform.Android)

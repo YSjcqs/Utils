@@ -41,84 +41,79 @@ import com.epicgames.unreal.speechrec.NuiSpeechManager;
 		SpeechManager.ttsBasic.releaseTts();
 	}
 	
-	public void releaseDialog() {
-		SpeechManager.speechTranscriber.releaseDialog();
+	public int releaseDialog() {
+		return SpeechManager.speechTranscriber.releaseDialog();
 	}
 	
-	public void releaseTts() {
-		SpeechManager.ttsBasic.releaseTts();
+	public int releaseTts() {
+		return SpeechManager.ttsBasic.releaseTts();
 	}
 
 	public void dialogAudioPermissions() {
 		SpeechManager.audioPermissions(this);
 	}
 
-	public boolean startDialog() {
+	public void startDialog() {
 		if (SpeechManager.speechTranscriber.checkNotInitToast()) {
 			SpeechManager.speechTranscriber.startDialog();
-			return true;
 		}
-		return false;
 	}
 
-	public boolean stopDialog() {
+	public void stopDialog() {
 		if (SpeechManager.speechTranscriber.checkNotInitToast()) {
 			SpeechManager.speechTranscriber.stopDialog();
-			return true;
 		}
-		return false;
+	}
+	
+	public int getCurrentHandleCode() {
+	    return SpeechManager.speechTranscriber.getCurrentHandleCode();
 	}
 
 	public boolean checkDialog(){
 		return SpeechManager.speechTranscriber.checkNotInitToast();
 	}
 
-	public boolean startTts(String ttsText){
+	public int startTts(String ttsText){
 		if (SpeechManager.ttsBasic.checkNotInitToast()){
-			SpeechManager.ttsBasic.startTts(ttsText);
-			return true;
+			return SpeechManager.ttsBasic.startTts(ttsText);
 		}
-		return false;
+		return -1;
 	}
 
-	public boolean quitTts(){
+	public int quitTts(){
 		if (SpeechManager.ttsBasic.checkNotInitToast()){
-			SpeechManager.ttsBasic.quitTts();
-			return true;
+			return SpeechManager.ttsBasic.quitTts();
 		}
-		return false;
+		return -1;
 	}
 
-	public boolean cancelTts(){
+	public int cancelTts(){
 		if (SpeechManager.ttsBasic.checkNotInitToast()){
-			SpeechManager.ttsBasic.cancelTts();
-			return true;
+			return SpeechManager.ttsBasic.cancelTts();
 		}
-		return false;
+		return -1;
 	}
 
-	public boolean pauseTts(){
+	public int pauseTts(){
 		if (SpeechManager.ttsBasic.checkNotInitToast()){
-			SpeechManager.ttsBasic.pauseTts();
-			return true;
+			return SpeechManager.ttsBasic.pauseTts();
 		}
-		return false;
+		return -1;
 	}
 
-	public boolean resumeTts(){
+	public int resumeTts(){
 		if (SpeechManager.ttsBasic.checkNotInitToast()){
-			SpeechManager.ttsBasic.resumeTts();
-			return true;
+			return SpeechManager.ttsBasic.resumeTts();
 		}
-		return false;
+		return -1;
 	}
 
 	public boolean checkTts(){
 		return SpeechManager.ttsBasic.checkNotInitToast();
 	}
 	
-	public void setFontName(String name) {
-        SpeechManager.ttsBasic.setFontName(name);
+	public int setFontName(String name) {
+        return SpeechManager.ttsBasic.setFontName(name);
     }
 ]]>
         </insert>

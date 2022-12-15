@@ -50,14 +50,14 @@ public class NuiTtsBasic implements INativeTtsCallback {
         return nui_tts_instance.tts_release();
     }
 
-    public void startTts(String ttsText)
+    public int startTts(String ttsText)
     {
         if (!initialized) {
-            return;
+            return -1;
         }
         if (TextUtils.isEmpty(ttsText)) {
             Log.error("tts empty");
-            return;
+            return -1;
         }
 
         Log.debug("start play tts");
@@ -68,38 +68,38 @@ public class NuiTtsBasic implements INativeTtsCallback {
         if (charNum > 300) {
             Log.warn("text exceed 300 chars.");
         }
-        nui_tts_instance.startTts("1", "", ttsText);
+        return  nui_tts_instance.startTts("1", "", ttsText);
     }
-    public void quitTts()
+    public int quitTts()
     {
         Log.debug("tts release");
         mAudioTrack.stop();
-        nui_tts_instance.tts_release();
         initialized = false;
+        return nui_tts_instance.tts_release();
     }
-    public void cancelTts()
+    public int cancelTts()
     {
         Log.debug("cancel tts");
-        nui_tts_instance.cancelTts("");
         mAudioTrack.stop();
+        return nui_tts_instance.cancelTts("");
     }
-    public void pauseTts()
+    public int pauseTts()
     {
         Log.debug("pause tts");
-        nui_tts_instance.pauseTts();
         mAudioTrack.pause();
+        return nui_tts_instance.pauseTts();
     }
-    public void resumeTts()
+    public int resumeTts()
     {
         Log.debug("resume tts");
-        nui_tts_instance.resumeTts();
         mAudioTrack.play();
+        return nui_tts_instance.resumeTts();
     }
     
-    public void setFontName(String name)
+    public int setFontName(String name)
     {
         Log.debug("new font name:" + name);
-        nui_tts_instance.setparamTts("font_name", name);
+        return nui_tts_instance.setparamTts("font_name", name);
     }
 
     public int initialize(String ticket) {
@@ -107,8 +107,10 @@ public class NuiTtsBasic implements INativeTtsCallback {
 
         if (Constants.NuiResultCode.SUCCESS != ret) {
             Log.error("create failed");
+            return ret;
         }
 
+        initialized = true;
         // 在线语音合成发音人可以参考阿里云官网
         // https://help.aliyun.com/document_detail/84435.html
         nui_tts_instance.setparamTts("font_name", "siqi");

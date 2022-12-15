@@ -7,6 +7,7 @@
 #include "NuiUtils.h"
 #include "NuiInstance.generated.h"
 
+// 禁止在改下委托中修改UI数据
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FDialogEventCallbackDelegate, ENuiEvent, NuiEvent, int, ResultCode, FString, AsrString);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDialogAudioStateChangedDelegate, EAudioState, AudioState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDialogAudioRMSChangedDelegate, float, Value);
@@ -53,7 +54,6 @@ public:
 	{
 		TtsVolCallbackDelegate.Broadcast(Vol);
 	}
-
 	
 	UFUNCTION(BlueprintCallable, Category = "Nui")
 	void InitNuiSpeech(FString AppKey, FString AccessKeyId, FString AccessKeySecret);
@@ -61,32 +61,34 @@ public:
 	void ReleaseNuiSpeech();
 	
 	UFUNCTION(BlueprintCallable, Category = "Nui|Dialog")
-	bool StartDialog();
+	void StartDialog();
 	UFUNCTION(BlueprintCallable, Category = "Nui|Dialog")
-	bool StopDialog();
+	void StopDialog();
 	UFUNCTION(BlueprintCallable, Category = "Nui|Dialog")
 	bool CheckDialog();
 	UFUNCTION(BlueprintCallable, Category = "Nui|Dialog")
-	void ReleaseDialog();
+	int ReleaseDialog();
 	UFUNCTION(BlueprintCallable, Category = "Nui|Dialog")
 	void DialogAudioPermissions();
+	UFUNCTION(BlueprintCallable, Category = "Nui|Dialog")
+	int GetCurrentHandleCode();
 
 	UFUNCTION(BlueprintCallable, Category = "Nui|Tts")
-	bool StartTts(FString TtsText);
+	int StartTts(FString TtsText);
 	UFUNCTION(BlueprintCallable, Category = "Nui|Tts")
-	bool QuitTts();
+	int QuitTts();
 	UFUNCTION(BlueprintCallable, Category = "Nui|Tts")
-	bool CancelTts();
+	int CancelTts();
 	UFUNCTION(BlueprintCallable, Category = "Nui|Tts")
-	bool PauseTts();
+	int PauseTts();
 	UFUNCTION(BlueprintCallable, Category = "Nui|Tts")
-	bool ResumeTts();
+	int ResumeTts();
 	UFUNCTION(BlueprintCallable, Category = "Nui|Tts")
 	bool CheckTts();
 	UFUNCTION(BlueprintCallable, Category = "Nui|Tts")
-	void ReleaseTts();
+	int ReleaseTts();
 	UFUNCTION(BlueprintCallable, Category = "Nui|Tts")
-	void SetFontNameTts();
+	int SetFontNameTts(FString Name);
 
 	UPROPERTY(BlueprintAssignable)
 	FDialogEventCallbackDelegate DialogEventCallbackDelegate;

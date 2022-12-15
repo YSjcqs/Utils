@@ -1,11 +1,14 @@
 package com.epicgames.unreal.speechrec;
 
 import android.Manifest;
+import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Handler;
 import android.os.HandlerThread;
+
+import androidx.core.app.ActivityCompat;
 
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
@@ -14,11 +17,13 @@ import com.alibaba.idst.nui.Constants;
 import com.alibaba.idst.nui.INativeNuiCallback;
 import com.alibaba.idst.nui.KwsResult;
 import com.alibaba.idst.nui.NativeNui;
+import com.epicgames.unreal.GameActivity;
 import com.epicgames.unreal.Logger;
 
 public class NuiSpeechTranscriber implements INativeNuiCallback {
     public static Logger Log = new Logger("UE", "NuiSpeechTranscriber");
-    
+    private static int CurrentHandleCode = -1;
+
     NativeNui nui_instance = new NativeNui();
     final static int WAVE_FRAM_SIZE = 20 * 2 * 1 * 16000 / 1000; //20ms audio for 16k/16bit/mono
     public final static int SAMPLE_RATE = 16000;
@@ -37,11 +42,10 @@ public class NuiSpeechTranscriber implements INativeNuiCallback {
         mHanderThread = new HandlerThread("process_thread");
         mHanderThread.start();
         mHandler = new Handler(mHanderThread.getLooper());
-        mAudioRecorder = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, SAMPLE_RATE,
-                AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, WAVE_FRAM_SIZE * 4);
+
 
         //初始化SDK，注意用户需要在Auth.getAliYunTicket中填入相关ID信息才可以使用。
-        int ret = nui_instance.initialize(this,initParams, Constants.LogLevel.LOG_LEVEL_VERBOSE, true);
+        int ret = nui_instance.initialize(this, initParams, Constants.LogLevel.LOG_LEVEL_VERBOSE, true);
         Log.debug("result = " + ret);
         if (ret == Constants.NuiResultCode.SUCCESS) {
             mInit = true;
@@ -54,8 +58,8 @@ public class NuiSpeechTranscriber implements INativeNuiCallback {
         return ret;
     }
 
-    public void releaseDialog() {
-        nui_instance.release();
+    public int releaseDialog() {
+        return nui_instance.release();
     }
 
     private String genParams() {
@@ -82,29 +86,42 @@ public class NuiSpeechTranscriber implements INativeNuiCallback {
         }
         return params;
     }
+    
+    public int getCurrentHandleCode() {
+        return CurrentHandleCode;
+    }
 
     public void startDialog() {
+        CurrentHandleCode = -1;
+        if (ActivityCompat.checkSelfPermission(GameActivity.Get(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        if (mAudioRecorder == null)
+        {
+            mAudioRecorder = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, SAMPLE_RATE,
+                    AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, WAVE_FRAM_SIZE * 4);
+        }
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                int ret = nui_instance.startDialog(Constants.VadMode.TYPE_P2T,
+                CurrentHandleCode = nui_instance.startDialog(Constants.VadMode.TYPE_P2T,
                         genDialogParams());
-                Log.debug("start done with " + ret);
+                Log.debug("start done with " + CurrentHandleCode);
             }
         });
     }
 
     public void stopDialog()
     {
+        CurrentHandleCode = -1;
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                long ret = nui_instance.stopDialog();
-                Log.debug("cancel dialog " + ret + " end");
+                CurrentHandleCode = nui_instance.stopDialog();
+                Log.debug("cancel dialog " + CurrentHandleCode + " end");
             }
         });
     }
-
 
     private String genDialogParams() {
         String params = "";
@@ -208,6 +225,3 @@ public class NuiSpeechTranscriber implements INativeNuiCallback {
         }
     }
 }
-
-
-
