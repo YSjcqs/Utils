@@ -1,6 +1,7 @@
 # Visual Studio 2015 user specific files
 .vs/
 .vscode
+.DS_Store
 *.ignore
 *.code-workspace
 *Makefile
