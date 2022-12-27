@@ -5,9 +5,9 @@ import java.io.IOException;
 import com.epicgames.unreal.speechrec.token.AccessToken;
 
 public class Auth {
-    private static String mAapKey = "";
-    private static String mAccessKeyId = "";
-    private static String mAccessKeySecret = "";
+    private static String mAapKey = "sdyKbDi6pxPPPJO5";
+    private static String mAccessKeyId = "LTAI5t9QxQn3ELsTuDy7kVqR";
+    private static String mAccessKeySecret = "wqcjfvUfDhozFpSeVIPH7CwJnFgVYf";
 
     public static JSONObject getAliYunTicket() {
         JSONObject object = new JSONObject();

@@ -36,13 +36,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class AliSpeechRecognizer implements INativeNuiCallback {
     public static Logger Log = new Logger("UE", "AliSpeechRecognizer");
 
-    public native void nativeSetGlobalRecognizer();
-    public native void nativeRecognizerErrorCallback(int event, String errorMessage);
-    public native void nativeRecognizerEventCallback(int event, final int resultCode, int arg2, KwsResult kwsResult, AsrResult asrResult);
-    public native int nativeRecognizerNeedAudioData(byte[] buffer, int len, int javaRet);
+    public native void nativeRecognizerErrorCallback(int errorCode, String errorMessage);
+    public native void nativeRecognizerEventCallback(int event, int resultCode, int arg2, int kwsType, String kwsString, boolean asrFinish, int asrResultCode, String asrString);
     public native void nativeRecognizerAudioStateChanged(int state);
-    public native void nativeRecognizerAudioRMSChanged(float var1);
-    public native void nativeRecognizerVprEventCallback(int event);
+//    public native int nativeRecognizerNeedAudioData(byte[] buffer, int len, int javaRet);
+//    public native void nativeRecognizerAudioRMSChanged(float var1);
+//    public native void nativeRecognizerVprEventCallback(int event);
 
     NativeNui nui_instance = new NativeNui();
     final static int WAVE_FRAM_SIZE = 20 * 2 * 1 * 16000 / 1000; //20ms audio for 16k/16bit/mono
@@ -52,11 +51,6 @@ public class AliSpeechRecognizer implements INativeNuiCallback {
     private HandlerThread mHanderThread;
     private boolean mInit = false;
     private Handler mHandler;
-
-    public AliSpeechRecognizer()
-    {
-        nativeSetGlobalRecognizer();
-    }
 
     public void initialize() {
         if (CommonUtils.copyAssetsData(GameActivity.Get())) {
@@ -258,7 +252,23 @@ public class AliSpeechRecognizer implements INativeNuiCallback {
 
         }
 
-        nativeRecognizerEventCallback(event.ordinal(), resultCode, arg2, kwsResult, asrResult);
+        int kwsType = -1;
+        String kwsString = "";
+        boolean asrFinish = false;
+        int asrCode = -1;
+        String asrString = "";
+        if (kwsResult != null)
+        {
+            kwsType = kwsResult.type.ordinal();
+            kwsString = kwsResult.kws;
+        }
+        if (asrResult != null)
+        {
+            asrFinish = asrResult.finish;
+            asrCode = asrResult.resultCode;
+            asrString = asrResult.asrResult;
+        }
+        nativeRecognizerEventCallback(event.ordinal(), resultCode, arg2, kwsType, kwsString, asrFinish, asrCode, asrString);
     }
 
     //当调用NativeNui的start后，会一定时间反复回调该接口，底层会提供buffer并告知这次需要数据的长度
@@ -271,7 +281,8 @@ public class AliSpeechRecognizer implements INativeNuiCallback {
             return -1;
         }
         ret = mAudioRecorder.read(buffer, 0, len);
-        return nativeRecognizerNeedAudioData(buffer, len, ret);
+//        return nativeRecognizerNeedAudioData(buffer, len, ret);
+        return ret;
     }
 
     //当录音状态发送变化的时候调用
@@ -295,13 +306,13 @@ public class AliSpeechRecognizer implements INativeNuiCallback {
     @Override
     public void onNuiAudioRMSChanged(float val) {
         Log.debug( "onNuiAudioRMSChanged vol " + val);
-        nativeRecognizerAudioRMSChanged(val);
+//        nativeRecognizerAudioRMSChanged(val);
     }
 
     @Override
     public void onNuiVprEventCallback(Constants.NuiVprEvent event) {
         Log.debug( "onNuiVprEventCallback event " + event);
-        nativeRecognizerVprEventCallback(event.ordinal());
+//        nativeRecognizerVprEventCallback(event.ordinal());
     }
 }
 

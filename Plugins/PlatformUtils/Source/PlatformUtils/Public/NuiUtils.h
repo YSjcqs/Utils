@@ -3,137 +3,109 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UObject/Object.h"
+#include "NuiTypes.h"
+#include "NuiUtils.generated.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogNuiDebug, Log, All);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnNuiErrorDelegate, int, ErrorCode, FString, ErrorMessage);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FOnNuiEventDelegate, int, Event, int, ResultCode, int, Arg2, FKwsResult, KwsResult, FAsrResult, AsrResult);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNuiAudioStateChangedDelegate, int, State);
 
-UENUM(BlueprintType)
-enum class ENuiVadMode : uint8
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnNuiTtsEventDelegate, int, Event, FString, TaskID, int, RetCode, FString, ErrorMsg);
+
+class FNuiSpeechRecognizerBase;
+class FNuiSpeechTranscriberBase;
+class FNuiSpeechTtsBase;
+
+UCLASS(BlueprintType)
+class PLATFORMUTILS_API UNuiSpeechRecognizer : public UObject
 {
-	MODE_VAD,
-	MODE_P2T,
-	MODE_KWS,
-	MODE_PARALLEL,
-	MODE_KWS2PARALLEL,
-	MODE_AUTO_CONTINUAL,
-	MODE_KWS_CONTINUAL,
-	MODE_KWS2TALK
-};
-
-UENUM(BlueprintType)
-enum class ENuiLogLevel : uint8
-{
-	LOG_LEVEL_VERBOSE,
-	LOG_LEVEL_DEBUG,
-	LOG_LEVEL_INFO,
-	LOG_LEVEL_WARNING,
-	LOG_LEVEL_ERROR,
-	LOG_LEVEL_NONE
-};
-
-UENUM(BlueprintType)
-enum class EAudioState : uint8
-{
-	STATE_OPEN,
-	STATE_PAUSE,
-	STATE_CLOSE
-};
-
-UENUM(BlueprintType)
-enum class ENuiEvent : uint8
-{
-	EVENT_VAD_START,
-	EVENT_VAD_TIMEOUT,
-	EVENT_VAD_END,
-	EVENT_WUW,
-	EVENT_WUW_TRUSTED,
-	EVENT_WUW_CONFIRMED,
-	EVENT_WUW_REJECTED,
-	EVENT_WUW_END,
-	EVENT_ASR_PARTIAL_RESULT,
-	EVENT_ASR_RESULT,
-	EVENT_ASR_ERROR,
-	EVENT_DIALOG_ERROR,
-	EVENT_ONESHOT_TIMEOUT,
-	EVENT_DIALOG_RESULT,
-	EVENT_WUW_HINT,
-	EVENT_VPR_RESULT,
-	EVENT_TEXT2ACTION_DIALOG_RESULT,
-	EVENT_TEXT2ACTION_ERROR,
-	EVENT_ATTR_RESULT,
-	EVENT_MIC_ERROR,
-	EVENT_DIALOG_EX,
-	EVENT_WUW_ERROR,
-	EVENT_BEFORE_CONNECTION,
-	EVENT_SENTENCE_START,
-	EVENT_SENTENCE_END,
-	EVENT_SENTENCE_SEMANTICS,
-	EVENT_TRANSCRIBER_COMPLETE,
-	EVENT_FILE_TRANS_CONNECTED,
-	EVENT_FILE_TRANS_UPLOADED,
-	EVENT_FILE_TRANS_RESULT,
-	EVENT_FILE_TRANS_UPLOAD_PROGRESS
-};
-
-UENUM(BlueprintType)
-enum class ENuiVprEvent : uint8
-{
-	EVENT_VPR_NONE = 0,
-	EVENT_VPR_REGISTER_START,
-	EVENT_VPR_REGISTER_DONE,
-	EVENT_VPR_REGISTER_FAILED,
-	EVENT_VPR_UPDATE_START,
-	EVENT_VPR_UPDATE_DONE,
-	EVENT_VPR_UPDATE_FAIL,
-	EVENT_VPR_DELETE_DONE,
-	EVENT_VPR_DELETE_FAIL,
-	DEFAULT_ERROR
-};
-
-UENUM(BlueprintType)
-enum class EWuwType : uint8
-{
-	TYPE_UNKNOWN = static_cast<uint8>(-1),
-	TYPE_MAIN = 0,
-	TYPE_ACTION = 1,
-	TYPE_PREFIX = 2,
-	TYPE_DANAMIC = 3,
-	TYPE_ONESHOT = 4
-};
-
-UENUM(BlueprintType)
-enum class ETtsEvent : uint8
-{
-	TTS_EVENT_START = 0,
-	TTS_EVENT_END = 1,
-	TTS_EVENT_CANCEL = 2,
-	TTS_EVENT_PAUSE = 3,
-	TTS_EVENT_RESUME = 4,
-	TTS_EVENT_ERROR = 5
-};
-
-class FNuiUtilsBase
-{
+	GENERATED_BODY()
 public:
-	FNuiUtilsBase() { }
-	virtual ~FNuiUtilsBase() { }
+	UNuiSpeechRecognizer();
+	UFUNCTION(BlueprintCallable)
+	void Initialize();
+	UFUNCTION(BlueprintCallable)
+	void Destroy();
+	UFUNCTION(BlueprintCallable)
+	void RequestPermissionAudio();
+	UFUNCTION(BlueprintCallable)
+	void SetRecognizerVadMode(bool bVad);
+	UFUNCTION(BlueprintCallable)
+	void StartDialog();
+	UFUNCTION(BlueprintCallable)
+	void StopDialog();
 
-	virtual void InitNuiSpeech(FString AppKey, FString AccessKeyId, FString AccessKeySecret) { }
-	virtual void ReleaseNuiSpeech() { }
+	UPROPERTY(BlueprintAssignable)
+	FOnNuiErrorDelegate ErrorDelegate;
+	UPROPERTY(BlueprintAssignable)
+	FOnNuiEventDelegate EventDelegate;
+	UPROPERTY(BlueprintAssignable)
+	FOnNuiAudioStateChangedDelegate AudioStateChangedDelegate;
 
-	virtual int ReleaseDialog() { return -1; }
-	virtual void StartDialog() { }
-	virtual void StopDialog() { }
-	virtual bool CheckDialog() { return false; }
-	virtual void DialogAudioPermissions() { }
-	virtual int GetCurrentHandleCode() { return -1; }
+private:
+	TSharedPtr<FNuiSpeechRecognizerBase> SpeechRecognizerPtr;
+};
 
-	virtual int StartTts(FString TtsText) { return -1; }
-	virtual int QuitTts() { return -1; }
-	virtual int CancelTts() { return -1; }
-	virtual int PauseTts() { return -1; }
-	virtual int ResumeTts() { return -1; }
-	virtual bool CheckTts() { return false; }
+UCLASS(BlueprintType)
+class PLATFORMUTILS_API UNuiSpeechTranscriber : public UObject
+{
+	GENERATED_BODY()
+public:
+	UNuiSpeechTranscriber();
+	UFUNCTION(BlueprintCallable)
+	void Initialize();
+	UFUNCTION(BlueprintCallable)
+	void Destroy();
+	UFUNCTION(BlueprintCallable)
+	void RequestPermissionAudio();
+	UFUNCTION(BlueprintCallable)
+	void SetTranscriberVadMode(bool bVad);
+	UFUNCTION(BlueprintCallable)
+	void StartDialog();
+	UFUNCTION(BlueprintCallable)
+	void StopDialog();
 
-	virtual int ReleaseTts() { return -1; }
-	virtual int SetFontNameTts(FString Name) { return -1; }
+	UPROPERTY(BlueprintAssignable)
+	FOnNuiErrorDelegate ErrorDelegate;
+	UPROPERTY(BlueprintAssignable)
+	FOnNuiEventDelegate EventDelegate;
+	UPROPERTY(BlueprintAssignable)
+	FOnNuiAudioStateChangedDelegate AudioStateChangedDelegate;
+private:
+	TSharedPtr<FNuiSpeechTranscriberBase> SpeechTranscriberPtr;
+};
+
+UCLASS(BlueprintType)
+class PLATFORMUTILS_API UNuiSpeechTts : public UObject
+{
+	GENERATED_BODY()
+public:
+	UNuiSpeechTts();
+
+	UFUNCTION(BlueprintCallable)
+	void Initialize();
+	UFUNCTION(BlueprintCallable)
+	void Destroy();
+	UFUNCTION(BlueprintCallable)
+	int StartTts(FString TtsText);
+	UFUNCTION(BlueprintCallable)
+	int StartEmotionTts(FString TtsText, FString Category, float Intensity = 1.0f, FString Voice = "zhitian_emo");
+	UFUNCTION(BlueprintCallable)
+	int QuitTts();
+	UFUNCTION(BlueprintCallable)
+	int CancelTts();
+	UFUNCTION(BlueprintCallable)
+	int PauseTts();
+	UFUNCTION(BlueprintCallable)
+	int ResumeTts();
+	UFUNCTION(BlueprintCallable)
+	int SetParamTts(FString Key, FString Value);
+
+	UPROPERTY(BlueprintAssignable)
+	FOnNuiErrorDelegate ErrorDelegate;
+	UPROPERTY(BlueprintAssignable)
+	FOnNuiTtsEventDelegate TtsEventDelegate;
+private:
+	TSharedPtr<FNuiSpeechTtsBase> SpeechTtsPtr;
 };

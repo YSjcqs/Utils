@@ -22,7 +22,6 @@
     <gameActivityImportAdditions>
         <insert>
 <![CDATA[
-import com.epicgames.unreal.speechrec.NuiSpeechManager;
 ]]>
         </insert>
     </gameActivityImportAdditions>
@@ -30,20 +29,7 @@ import com.epicgames.unreal.speechrec.NuiSpeechManager;
     <gameActivityClassAdditions>
         <insert>
 <![CDATA[
-    public AliSpeechTts CreateSpeechTts()
-	{
-		return new AliSpeechTts();
-	}
 
-	public AliSpeechRecognizer CreateSpeechRecognizer()
-	{
-		return new AliSpeechRecognizer();
-	}
-
-	public AliSpeechTranscriber CreateSpeechTranscriber()
-	{
-		return new AliSpeechTranscriber();
-	}
 ]]>
         </insert>
     </gameActivityClassAdditions>

@@ -38,11 +38,10 @@ import java.io.OutputStream;
 public class AliSpeechTts implements INativeTtsCallback {
     public static Logger Log = new Logger("UE", "AliSpeechTts");
 
-    public native void nativeSetGlobalRecognizer();
     public native void nativeTtsErrorCallback(int event, String errorMessage);
     public native void nativeTtsEventCallback(int event, String task_id, int ret_code, String errorMsg);
-    public native void nativeTtsDataCallback(String info, int info_len, byte[] data);
-    public native void nativeTtsVolCallback(int vol);
+//    public native void nativeTtsDataCallback(String info, int info_len, byte[] data);
+//    public native void nativeTtsVolCallback(int vol);
 
     NativeNui nui_tts_instance = new NativeNui(Constants.ModeType.MODE_TTS);
     String asset_path;
@@ -62,11 +61,6 @@ public class AliSpeechTts implements INativeTtsCallback {
             Log.debug( "play over");
         }
     });
-
-    public AliSpeechTts()
-    {
-        nativeSetGlobalRecognizer();
-    }
 
     public void setSaveWav(boolean bSave) {
         b_savewav = bSave;
@@ -264,11 +258,11 @@ public class AliSpeechTts implements INativeTtsCallback {
                 }
             }
         }
-        nativeTtsDataCallback(info, info_len, data);
+//        nativeTtsDataCallback(info, info_len, data);
     }
     @Override
     public void onTtsVolCallback(int vol) {
         Log.debug( "tts vol " + vol);
-        nativeTtsVolCallback(vol);
+//        nativeTtsVolCallback(vol);
     }
 }
