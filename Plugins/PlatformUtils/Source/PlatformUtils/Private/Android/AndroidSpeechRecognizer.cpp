@@ -5,8 +5,6 @@
 #include "Android/AndroidApplication.h"
 #include "Android/AndroidJNI.h"
 
-TMap<jobject, FAndroidSpeechRecognizer*> FAndroidSpeechRecognizer::GRecognizers;
-
 FName FAndroidSpeechRecognizer::GetClassName()
 {
 	if (FAndroidMisc::GetAndroidBuildVersion() >= 14)
@@ -28,18 +26,14 @@ FAndroidSpeechRecognizer::FAndroidSpeechRecognizer()
 	, StartDialogMethod(GetClassMethod("startDialog", "()V"))
 	, StopDialogMethod(GetClassMethod("stopDialog", "()V"))
 {
-	if (Object)
-	{
-		GRecognizers.Add(Object, this);
-	}
+	JNIEnv* JEnv = FAndroidApplication::GetJavaEnv();
+
+	jfieldID fid = JEnv->GetFieldID(Class, "UEObject", "J");
+	JEnv->SetLongField(Object, fid, (jlong)this);
 }
 
 FAndroidSpeechRecognizer::~FAndroidSpeechRecognizer()
 {
-	if (Object)
-	{
-		GRecognizers.Remove(Object);
-	}
 }
 
 void FAndroidSpeechRecognizer::Initialize()
@@ -69,10 +63,18 @@ void FAndroidSpeechRecognizer::StopDialog()
 
 extern "C"
 {
+FAndroidSpeechRecognizer* getUESpeechRecognizerObject(JNIEnv* jenv, jobject thiz)
+{
+	jclass clazz = jenv->GetObjectClass(thiz);
+	jfieldID fid = jenv->GetFieldID(clazz, "UEObject", "J");
+	jlong addr = jenv->GetLongField(thiz, fid);
+	return (FAndroidSpeechRecognizer*)addr;
+}
+	
 JNI_METHOD void Java_com_epicgames_unreal_speechrec_AliSpeechRecognizer_nativeRecognizerErrorCallback(
 	JNIEnv* jenv, jobject thiz, jint errorCode, jstring errorMessage)
 {
-	FAndroidSpeechRecognizer* SpeechRecognizerPtr = FAndroidSpeechRecognizer::GetRecognizer(thiz);
+	FAndroidSpeechRecognizer* SpeechRecognizerPtr = getUESpeechRecognizerObject(jenv, thiz);
 	if (SpeechRecognizerPtr)
 	{
 		FString ErrorMessage = FJavaHelper::FStringFromLocalRef(jenv, errorMessage);
@@ -83,7 +85,7 @@ JNI_METHOD void Java_com_epicgames_unreal_speechrec_AliSpeechRecognizer_nativeRe
 JNI_METHOD void Java_com_epicgames_unreal_speechrec_AliSpeechRecognizer_nativeRecognizerEventCallback(
 	JNIEnv* jenv, jobject thiz, jint event, jint resultCode, jint arg2, jint kwsType, jstring kwsString, jboolean asrFinish, jint asrResultCode, jstring asrString)
 {
-	FAndroidSpeechRecognizer* SpeechRecognizerPtr = FAndroidSpeechRecognizer::GetRecognizer(thiz);
+	FAndroidSpeechRecognizer* SpeechRecognizerPtr = getUESpeechRecognizerObject(jenv, thiz);
 	if (SpeechRecognizerPtr)
 	{
 		FKwsResult KwsResult(static_cast<int>(kwsType), FJavaHelper::FStringFromLocalRef(jenv, kwsString));
@@ -97,7 +99,7 @@ JNI_METHOD void Java_com_epicgames_unreal_speechrec_AliSpeechRecognizer_nativeRe
 JNI_METHOD void Java_com_epicgames_unreal_speechrec_AliSpeechRecognizer_nativeRecognizerAudioStateChanged(
 	JNIEnv* jenv, jobject thiz, jint state)
 {
-	FAndroidSpeechRecognizer* SpeechRecognizerPtr = FAndroidSpeechRecognizer::GetRecognizer(thiz);
+	FAndroidSpeechRecognizer* SpeechRecognizerPtr = getUESpeechRecognizerObject(jenv, thiz);
 	if (SpeechRecognizerPtr)
 	{
 		SpeechRecognizerPtr->OnRecognizerAudioStateChangedDelegate.ExecuteIfBound(static_cast<int>(state));

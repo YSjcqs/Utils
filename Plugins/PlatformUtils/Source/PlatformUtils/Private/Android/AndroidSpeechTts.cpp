@@ -4,8 +4,6 @@
 #include "Android/AndroidApplication.h"
 #include "Android/AndroidJNI.h"
 
-TMap<jobject, FAndroidSpeechTts*> FAndroidSpeechTts::GTtsList;
-
 FName FAndroidSpeechTts::GetClassName()
 {
 	if (FAndroidMisc::GetAndroidBuildVersion() >= 14)
@@ -28,17 +26,14 @@ FAndroidSpeechTts::FAndroidSpeechTts()
 	, ResumeTtsMethod(GetClassMethod("resumeTts", "()I"))
 	, SetParamTtsMethod(GetClassMethod("setparamTts", "(Ljava/lang/String;Ljava/lang/String;)I"))
 {
-	if (Object)
-	{
-		GTtsList.Add(Object, this);
-	}
+	JNIEnv* JEnv = FAndroidApplication::GetJavaEnv();
+
+	jfieldID fid = JEnv->GetFieldID(Class, "UEObject", "J");
+	JEnv->SetLongField(Object, fid, (jlong)this);
 }
 FAndroidSpeechTts::~FAndroidSpeechTts()
 {
-	if (Object)
-	{
-		GTtsList.Remove(Object);
-	}
+
 }
 void FAndroidSpeechTts::Initialize()
 {
@@ -76,10 +71,17 @@ int FAndroidSpeechTts::SetParamTts(FString Key, FString Value)
 
 extern "C"
 {
+FAndroidSpeechTts* getUESpeechTtsObject(JNIEnv* jenv, jobject thiz)
+{
+	jclass clazz = jenv->GetObjectClass(thiz);
+	jfieldID fid = jenv->GetFieldID(clazz, "UEObject", "J");
+	jlong addr = jenv->GetLongField(thiz, fid);
+	return (FAndroidSpeechTts*)addr;
+}
 JNI_METHOD void Java_com_epicgames_unreal_speechrec_AliSpeechTts_nativeTtsErrorCallback(
 	JNIEnv* jenv, jobject thiz, jint errorCode, jstring errorMessage)
 {
-	FAndroidSpeechTts* TtsPtr = FAndroidSpeechTts::GetTts(thiz);
+	FAndroidSpeechTts* TtsPtr = getUESpeechTtsObject(jenv, thiz);
 	if (TtsPtr)
 	{
 		FString ErrorMessage = FJavaHelper::FStringFromLocalRef(jenv, errorMessage);
@@ -90,7 +92,7 @@ JNI_METHOD void Java_com_epicgames_unreal_speechrec_AliSpeechTts_nativeTtsErrorC
 JNI_METHOD void Java_com_epicgames_unreal_speechrec_AliSpeechTts_nativeTtsEventCallback(
 	JNIEnv* jenv, jobject thiz, jint event, jstring task_id, jint ret_code, jstring errorMsg)
 {
-	FAndroidSpeechTts* TtsPtr = FAndroidSpeechTts::GetTts(thiz);
+	FAndroidSpeechTts* TtsPtr = getUESpeechTtsObject(jenv, thiz);
 	if (TtsPtr)
 	{
 		FString TaskID = FJavaHelper::FStringFromLocalRef(jenv, task_id);

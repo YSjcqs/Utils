@@ -46,6 +46,7 @@ public class AliSpeechTts implements INativeTtsCallback {
     NativeNui nui_tts_instance = new NativeNui(Constants.ModeType.MODE_TTS);
     String asset_path;
     Toast mToast;
+    private long UEObject = 0;
     private OutputStream output_file = null;
     private boolean b_savewav = false;
     boolean initialized =  false;

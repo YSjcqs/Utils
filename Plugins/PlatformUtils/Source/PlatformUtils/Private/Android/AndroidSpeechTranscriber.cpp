@@ -5,8 +5,6 @@
 #include "Android/AndroidApplication.h"
 #include "Android/AndroidJNI.h"
 
-TMap<jobject, FAndroidSpeechTranscriber*> FAndroidSpeechTranscriber::GTranscribers;
-
 FName FAndroidSpeechTranscriber::GetClassName()
 {
 	if (FAndroidMisc::GetAndroidBuildVersion() >= 14)
@@ -28,18 +26,14 @@ FAndroidSpeechTranscriber::FAndroidSpeechTranscriber()
 	, StartDialogMethod(GetClassMethod("startDialog", "()V"))
 	, StopDialogMethod(GetClassMethod("stopDialog", "()V"))
 {
-	if (Object)
-	{
-		GTranscribers.Add(Object, this);
-	}
+	JNIEnv* JEnv = FAndroidApplication::GetJavaEnv();
+
+	jfieldID fid = JEnv->GetFieldID(Class, "UEObject", "J");
+	JEnv->SetLongField(Object, fid, (jlong)this);
 }
 
 FAndroidSpeechTranscriber::~FAndroidSpeechTranscriber()
 {
-	if (Object)
-	{
-		GTranscribers.Remove(Object);
-	}
 }
 
 void FAndroidSpeechTranscriber::Initialize()
@@ -69,10 +63,17 @@ void FAndroidSpeechTranscriber::StopDialog()
 
 extern "C"
 {
+FAndroidSpeechTranscriber* getUESpeechTranscriberObject(JNIEnv* jenv, jobject thiz)
+{
+	jclass clazz = jenv->GetObjectClass(thiz);
+	jfieldID fid = jenv->GetFieldID(clazz, "UEObject", "J");
+	jlong addr = jenv->GetLongField(thiz, fid);
+	return (FAndroidSpeechTranscriber*)addr;
+}
 JNI_METHOD void Java_com_epicgames_unreal_speechrec_AliSpeechTranscriber_nativeTranscriberErrorCallback(
 	JNIEnv* jenv, jobject thiz, jint errorCode, jstring errorMessage)
 {
-	FAndroidSpeechTranscriber* SpeechTranscriberPtr = FAndroidSpeechTranscriber::GetTranscriber(thiz);
+	FAndroidSpeechTranscriber* SpeechTranscriberPtr = getUESpeechTranscriberObject(jenv, thiz);
 	if (SpeechTranscriberPtr)
 	{
 		FString ErrorMessage = FJavaHelper::FStringFromLocalRef(jenv, errorMessage);
@@ -83,7 +84,7 @@ JNI_METHOD void Java_com_epicgames_unreal_speechrec_AliSpeechTranscriber_nativeT
 JNI_METHOD void Java_com_epicgames_unreal_speechrec_AliSpeechTranscriber_nativeTranscriberEventCallback(
 	JNIEnv* jenv, jobject thiz, jint event, jint resultCode, jint arg2, jint kwsType, jstring kwsString, jboolean asrFinish, jint asrResultCode, jstring asrString)
 {
-	FAndroidSpeechTranscriber* SpeechTranscriberPtr = FAndroidSpeechTranscriber::GetTranscriber(thiz);
+	FAndroidSpeechTranscriber* SpeechTranscriberPtr = getUESpeechTranscriberObject(jenv, thiz);
 	if (SpeechTranscriberPtr)
 	{
 		FKwsResult KwsResult(static_cast<int>(kwsType), FJavaHelper::FStringFromLocalRef(jenv, kwsString));
@@ -97,7 +98,7 @@ JNI_METHOD void Java_com_epicgames_unreal_speechrec_AliSpeechTranscriber_nativeT
 JNI_METHOD void Java_com_epicgames_unreal_speechrec_AliSpeechTranscriber_nativeTranscriberAudioStateChanged(
 	JNIEnv* jenv, jobject thiz, jint state)
 {
-	FAndroidSpeechTranscriber* SpeechTranscriberPtr = FAndroidSpeechTranscriber::GetTranscriber(thiz);
+	FAndroidSpeechTranscriber* SpeechTranscriberPtr = getUESpeechTranscriberObject(jenv, thiz);
 	if (SpeechTranscriberPtr)
 	{
 		SpeechTranscriberPtr->OnTranscriberAudioStateChangedDelegate.ExecuteIfBound(static_cast<int>(state));

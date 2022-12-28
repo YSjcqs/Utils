@@ -10,6 +10,7 @@
 #include "OtherPlatform/OtherSpeechTranscriber.h"
 #include "OtherPlatform/OtherSpeechTts.h"
 
+PRAGMA_DISABLE_OPTIMIZATION
 UNuiSpeechRecognizer::UNuiSpeechRecognizer()
 {
 #if PLATFORM_ANDROID
@@ -176,3 +177,4 @@ int UNuiSpeechTts::SetParamTts(FString Key, FString Value)
 {
 	return SpeechTtsPtr->SetParamTts(Key, Value);
 }
+PRAGMA_ENABLE_OPTIMIZATION

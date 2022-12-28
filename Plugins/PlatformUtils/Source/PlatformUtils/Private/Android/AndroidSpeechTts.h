@@ -9,17 +9,6 @@
 class FAndroidSpeechTts : public FJavaClassObject, public FNuiSpeechTtsBase
 {
 public:
-	static FAndroidSpeechTts* GetTts(jobject SpeechObject)
-	{
-		FAndroidSpeechTts* TtsPtr = nullptr;
-		if (SpeechObject && GTtsList.Contains(SpeechObject))
-		{
-			TtsPtr = *GTtsList.Find(SpeechObject);
-		}
-		return TtsPtr;
-	}
-
-public:
 	FAndroidSpeechTts();
 	virtual ~FAndroidSpeechTts();
 	void Initialize() override;
@@ -33,7 +22,6 @@ public:
 
 private:
 	static FName GetClassName();
-	static TMap<jobject, FAndroidSpeechTts*> GTtsList;
 
 	FJavaClassMethod InitializeMethod;
 	FJavaClassMethod DestroyMethod;

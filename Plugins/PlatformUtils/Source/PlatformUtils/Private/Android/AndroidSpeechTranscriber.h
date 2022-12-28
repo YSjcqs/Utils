@@ -9,17 +9,6 @@
 class FAndroidSpeechTranscriber : public FJavaClassObject, public FNuiSpeechTranscriberBase
 {
 public:
-	static FAndroidSpeechTranscriber* GetTranscriber(jobject SpeechObject)
-	{
-		FAndroidSpeechTranscriber* TranscriberPtr = nullptr;
-		if (SpeechObject && GTranscribers.Contains(SpeechObject))
-		{
-			TranscriberPtr = *GTranscribers.Find(SpeechObject);
-		}
-		return TranscriberPtr;
-	}
-
-public:
 	FAndroidSpeechTranscriber();
 	virtual ~FAndroidSpeechTranscriber();
 	void Initialize() override;
@@ -31,7 +20,6 @@ public:
 
 private:
 	static FName GetClassName();
-	static TMap<jobject, FAndroidSpeechTranscriber*> GTranscribers;
 
 	FJavaClassMethod InitializeMethod;
 	FJavaClassMethod DestroyMethod;

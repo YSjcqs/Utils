@@ -49,6 +49,7 @@ public class AliSpeechTranscriber implements INativeNuiCallback{
 //    public native void nativeTranscriberVprEventCallback(int event);
 
     NativeNui nui_instance = new NativeNui();
+    private long UEObject = 0;
     final static int WAVE_FRAM_SIZE = 20 * 2 * 1 * 16000 / 1000; //20ms audio for 16k/16bit/mono
     public final static int SAMPLE_RATE = 16000;
     private AudioRecord mAudioRecorder;
