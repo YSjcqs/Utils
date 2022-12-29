@@ -4,10 +4,6 @@
 #include "UI/SpeechWidget.h"
 
 #include "NuiUtils.h"
-#include "Misc/CoreMiscDefines.h"
-#include "Misc/CoreMiscDefines.h"
-
-PRAGMA_DISABLE_OPTIMIZATION
 
 void USpeechWidget::NativeOnInitialized()
 {
@@ -29,4 +25,3 @@ void USpeechWidget::StopSpeech()
 	SpeechRecognizer->StopDialog();
 	SpeechRecognizer->Destroy();
 }
-PRAGMA_ENABLE_OPTIMIZATION

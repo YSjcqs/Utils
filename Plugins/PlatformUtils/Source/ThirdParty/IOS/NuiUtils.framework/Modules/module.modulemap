@@ -1,0 +1,6 @@
+framework module NuiUtils {
+  umbrella header "NuiUtils.h"
+
+  export *
+  module * { export * }
+}

@@ -31,13 +31,13 @@ public class PlatformUtils : ModuleRules
 			}
 			else if(Target.Platform == UnrealTargetPlatform.IOS)
 			{
-				return Path.Combine(NUIBinariesDirectory, "nuisdk.framework", "Headers");
+				return Path.Combine(BinariesDirectory, "NuiUtils.framework", "Headers");
 			}
 			return Path.Combine(ThirdPartyDirectory, "Include");
 		}
 	}
 
-	public string NUIBinariesDirectory
+	public string BinariesDirectory
 	{
 		get
 		{
@@ -53,44 +53,6 @@ public class PlatformUtils : ModuleRules
 		}
 	}
 
-	public string NUILibraryLinkNameBase
-	{
-		get
-		{
-			if(Target.Platform == UnrealTargetPlatform.Android)
-			{
-				return "nuisdk";
-			}
-			
-			return string.Format("nuisdk-{0}-Shipping", Target.Platform.ToString());
-		}
-	}	
-
-	public string NUIRuntimeLibraryFileName
-	{
-		get
-		{
-			if (Target.Platform == UnrealTargetPlatform.Mac)
-			{
-				return "lib" + NUILibraryLinkNameBase + ".dylib";
-			}
-			else if (Target.Platform == UnrealTargetPlatform.IOS)
-			{
-				return NUILibraryLinkNameBase + ".framework";
-			}
-			else if (Target.Platform == UnrealTargetPlatform.Android ||
-			         Target.Platform.IsInGroup(UnrealPlatformGroup.Unix))
-			{
-				return "lib" + NUILibraryLinkNameBase + ".so";
-			}
-			else if (Target.Platform.IsInGroup(UnrealPlatformGroup.Microsoft))
-			{
-				return NUILibraryLinkNameBase + ".dll";
-			}
-
-			throw new BuildException("Unsupported platform");
-		}
-	}
 	public PlatformUtils(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
@@ -110,18 +72,12 @@ public class PlatformUtils : ModuleRules
 		{
 			PublicIncludePaths.Add(NUIIncludeDirectory);
 			AdditionalPropertiesForReceipt.Add("IOSPlugin", Path.Combine(ModuleDirectory, "NativeIOSPlatform_UPL.xml"));
-			PublicAdditionalFrameworks.Add(new Framework("nuisdk", NUIBinariesDirectory, "", true));
+			PublicAdditionalFrameworks.Add(new Framework("NuiUtils", BinariesDirectory, "", true));
 		}
 		else if(Target.Platform == UnrealTargetPlatform.Android)
 		{
 			PrivateDependencyModuleNames.AddRange(new string[] { "Launch" });
 			AdditionalPropertiesForReceipt.Add("AndroidPlugin", Path.Combine(ModuleDirectory, "NativeAndroidPlatform_UPL.xml"));
-		}
-		else
-		{
-			// RuntimeDependencies.Add(Path.Combine(EngineBinariesDir, NUIRuntimeLibraryFileName), Path.Combine(NUIBinariesDirectory, NUIRuntimeLibraryFileName));
-			// PublicRuntimeLibraryPaths.Add(EngineBinariesDir);
-			// PublicDelayLoadDLLs.Add(NUIRuntimeLibraryFileName);
 		}
 	}
 }

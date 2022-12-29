@@ -3,18 +3,26 @@
 
 #include "NuiUtils.h"
 
+#if PLATFORM_ANDROID
 #include "Android/AndroidSpeechRecognizer.h"
 #include "Android/AndroidSpeechTranscriber.h"
 #include "Android/AndroidSpeechTts.h"
+#elif PLATFORM_IOS
+#include "IOS/IOSSpeechRecognizer.h"
+#include "IOS/IOSSpeechTranscriber.h"
+#include "IOS/IOSSpeechTts.h"
+#else
 #include "OtherPlatform/OtherSpeechRecognizer.h"
 #include "OtherPlatform/OtherSpeechTranscriber.h"
 #include "OtherPlatform/OtherSpeechTts.h"
+#endif
 
-PRAGMA_DISABLE_OPTIMIZATION
 UNuiSpeechRecognizer::UNuiSpeechRecognizer()
 {
 #if PLATFORM_ANDROID
 	SpeechRecognizerPtr = MakeShareable(new FAndroidSpeechRecognizer);
+#elif PLATFORM_IOS
+	SpeechRecognizerPtr = MakeShareable(new FIOSSpeechRecognizer);
 #else
 	SpeechRecognizerPtr = MakeShareable(new FOtherSpeechRecognizer);
 #endif
@@ -66,6 +74,8 @@ UNuiSpeechTranscriber::UNuiSpeechTranscriber()
 {
 #if PLATFORM_ANDROID
 	SpeechTranscriberPtr = MakeShareable(new FAndroidSpeechTranscriber);
+#elif PLATFORM_IOS
+	SpeechTranscriberPtr = MakeShareable(new FIOSSpeechTranscriber);
 #else
 	SpeechTranscriberPtr = MakeShareable(new FOtherSpeechTranscriber);
 #endif
@@ -117,6 +127,8 @@ UNuiSpeechTts::UNuiSpeechTts()
 {
 #if PLATFORM_ANDROID
 	SpeechTtsPtr = MakeShareable(new FAndroidSpeechTts);
+#elif PLATFORM_IOS
+	SpeechTtsPtr = MakeShareable(new FIOSSpeechTts);
 #else
 	SpeechTtsPtr = MakeShareable(new FOtherSpeechTts);
 #endif
@@ -177,4 +189,3 @@ int UNuiSpeechTts::SetParamTts(FString Key, FString Value)
 {
 	return SpeechTtsPtr->SetParamTts(Key, Value);
 }
-PRAGMA_ENABLE_OPTIMIZATION

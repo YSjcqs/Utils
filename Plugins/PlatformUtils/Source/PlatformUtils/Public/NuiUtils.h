@@ -13,9 +13,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNuiAudioStateChangedDelegate, int
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnNuiTtsEventDelegate, int, Event, FString, TaskID, int, RetCode, FString, ErrorMsg);
 
-class FNuiSpeechRecognizerBase;
-class FNuiSpeechTranscriberBase;
 class FNuiSpeechTtsBase;
+class FNuiSpeechTranscriberBase;
+class FNuiSpeechRecognizerBase;
 
 UCLASS(BlueprintType)
 class PLATFORMUTILS_API UNuiSpeechRecognizer : public UObject
